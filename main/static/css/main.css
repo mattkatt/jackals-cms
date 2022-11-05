@@ -1,0 +1,41 @@
+body.body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #dfc98b;
+}
+
+main.main {
+  flex-grow: 1;
+}
+
+.title, .font.fancy {
+  font-family: 'Montez'
+}
+
+nav.navbar, footer.footer {
+  color: #ffffff;
+  background-color: #161E29;
+}
+
+nav.navbar a {
+  color: #ffffff;
+}
+
+nav.navbar .navbar-brand img {
+  margin-right: 6px;
+}
+
+.container .content {
+  background-color: #ffffff;
+  box-shadow: 0 3px 5px 0 rgba(0,0,0,0.25);
+}
+
+.hero.hero-img {
+  background-position: center 20%;
+  background-size: cover;
+}
+
+.hero.hero-img.hero-img-center {
+  background-position: center;
+}

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block body_class %}template-blogpage{% endblock %}
+
+{% block content %}
+  <h1 class="title is-1">{{ page.title }}</h1>
+  <p class="meta">{{ page.date }}</p>
+
+  {% with categories=page.categories.all %}
+    {% if categories %}
+      <h3 class="title is-3">Posted in:</h3>
+      <div class="tags is-large">
+        {% for category in categories %}
+          <span class="tag">{{ category.name }}</span>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <div class="intro">{{ page.intro }}</div>
+
+  {{ page.body|richtext }}
+
+  {% for item in page.gallery_images.all %}
+    <div>
+      {% image item.image fill-320x240 %}
+      <p>{{ item.caption }}</p>
+    </div>
+  {% endfor %}
+
+  {% if page.tags.all.count %}
+    <h3 class="title is-3">Tags</h3>
+    <div class="tags">
+      {% for tag in page.tags.all %}
+        <a href="{% slugurl 'tags' %}?tag={{ tag }}">
+          <span class="tag">{{ tag }}</span>
+        </a>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <p><a href="{{ page.get_parent.url }}">Return to library</a></p>
+
+{% endblock %}

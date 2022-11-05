@@ -1,0 +1,174 @@
+from django.apps import apps
+from django.db import models
+from django.db.models import Model
+from django.forms import ModelForm, Textarea
+from wagtail.core.fields import RichTextField
+from wagtail.admin.panels import FieldPanel, InlinePanel
+from wagtail.models import Orderable, Page
+
+
+class EventsIndexPage(Page):
+    intro = RichTextField(blank=True)
+
+    content_panels = Page.content_panels + [
+        FieldPanel('intro', classname="full")
+    ]
+
+    def get_context(self, request, *args, **kwargs):
+        context = super().get_context(request)
+        events = self.get_children().live()
+        context['events'] = events
+
+        try:
+            events: Page = apps.get_model(app_label='events', model_name='EventPage')
+            latest_event = events.objects.latest('event_date')
+        except Page.DoesNotExist:
+            latest_event = None
+        context['latest_event'] = latest_event
+
+        return context
+
+
+class EventBooking(Orderable):
+    # region CONSTS
+    PLAYER = 'PL'
+    MONSTER = 'MN'
+    STAFF = 'ST'
+
+    PLAYER_TYPES = [
+        (PLAYER, 'Player'),
+        (MONSTER, 'Monster'),
+        (STAFF, 'Staff')
+    ]
+
+    BEARS = 'B'
+    DRAGONS = 'D'
+    GRYPHONS = 'G'
+    HARTS = 'H'
+    JACKALS = 'J'
+    LIONS = 'L'
+    TARANTULAS = 'T'
+    UNICORNS = 'U'
+    VIPERS = 'V'
+    WOLVES = 'W'
+
+    FACTIONS = [
+        (BEARS, 'Bears'),
+        (DRAGONS, 'Dragons'),
+        (GRYPHONS, 'Gryphons'),
+        (HARTS, 'Harts'),
+        (JACKALS, 'Jackals'),
+        (LIONS, 'Lions'),
+        (TARANTULAS, 'Tarantulas'),
+        (UNICORNS, 'Unicorns'),
+        (VIPERS, 'Vipers'),
+        (WOLVES, 'Wolves'),
+    ]
+    # endregion
+
+    event = models.ForeignKey('EventPage', on_delete=models.PROTECT)
+
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    email = models.EmailField()
+    contact_number = models.CharField(max_length=15)
+
+    lt_player_id = models.CharField(
+        max_length=15, blank=True, null=True,
+        help_text='Required if you have an existing Lorien Trust character (otherwise no blue gold for you!)'
+    )
+    player_type = models.CharField(max_length=2, choices=PLAYER_TYPES, default=PLAYER)
+
+    character_name = models.CharField(max_length=255, blank=True, null=True)
+    character_faction = models.CharField(max_length=1, choices=FACTIONS, blank=True, null=True)
+
+    is_catering = models.BooleanField(verbose_name='YES, I want food!', default=False)
+    emergency_contact_name = models.CharField(max_length=255)
+    emergency_contact_number = models.CharField(max_length=15)
+    home_address = models.TextField(blank=True)
+    medical_information = models.TextField(blank=True)
+
+
+class EventBookingForm(ModelForm):
+    class Meta:
+        model = EventBooking
+        fields = [
+            'first_name',
+            'last_name',
+            'email',
+            'contact_number',
+            'player_type',
+            'lt_player_id',
+            'player_type',
+            'character_name',
+            'character_faction',
+            'is_catering',
+            'emergency_contact_name',
+            'emergency_contact_number',
+            'home_address',
+            'medical_information',
+        ]
+        widgets = {
+            'home_address': Textarea(attrs={'rows': 3}),
+            'medical_information': Textarea(attrs={'rows': 3})
+        }
+
+
+class EventPage(Page):
+    event_date = models.DateField(verbose_name="Event date")
+    intro = models.CharField(max_length=250, default='')
+    description = RichTextField(blank=True)
+    details = RichTextField(blank=True)
+    image = models.ForeignKey('wagtailimages.Image', on_delete=models.SET_NULL, null=True, related_name='+')
+    player_limit = models.IntegerField(default=0)
+    monster_limit = models.IntegerField(default=0)
+    player_cost = models.DecimalField(verbose_name='Player cost', default=0, max_digits=4, decimal_places=2)
+    monster_cost = models.DecimalField(verbose_name='Monster cost', default=0, max_digits=4, decimal_places=2)
+    player_catering_cost = models.DecimalField(
+        verbose_name='Player catering cost', default=0, max_digits=4, decimal_places=2
+    )
+    monster_catering_cost = models.DecimalField(
+        verbose_name='Monster catering cost', default=0, max_digits=4, decimal_places=2
+    )
+
+    content_panels = Page.content_panels + [
+        FieldPanel('event_date'),
+        FieldPanel('intro'),
+        FieldPanel('description'),
+        FieldPanel('details'),
+        FieldPanel('image'),
+        FieldPanel('player_limit'),
+        FieldPanel('monster_limit'),
+        FieldPanel('player_cost'),
+        FieldPanel('monster_cost'),
+        FieldPanel('player_catering_cost'),
+        FieldPanel('monster_catering_cost'),
+    ]
+
+    @property
+    def all_bookings(self):
+        return EventBooking.objects.filter(event=self)
+
+    @property
+    def player_bookings(self):
+        return EventBooking.objects.filter(event=self, player_type=EventBooking.PLAYER)
+
+    @property
+    def monster_bookings(self):
+        return EventBooking.objects.filter(event=self, player_type=EventBooking.MONSTER)
+
+    def get_context(self, request, *args, **kwargs):
+        context = super().get_context(request)
+        booking_form = EventBookingForm()
+        context['booking_form'] = booking_form
+        context['player_bookings'] = self.player_bookings
+        context['monster_bookings'] = self.monster_bookings
+
+        try:
+            events: Page = apps.get_model(app_label='events', model_name='EventPage')
+            latest_event = events.objects.latest('event_date')
+        except Page.DoesNotExist:
+            latest_event = None
+        context['latest_event'] = latest_event
+
+        return context

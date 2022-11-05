@@ -1,0 +1,121 @@
+{% load static wagtailcore_tags wagtailimages_tags wagtailuserbar %}
+
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>
+    {% block title %}
+      {% if page.seo_title %}{{ page.seo_title }}{% else %}{{ page.title }}{% endif %}
+    {% endblock %}
+    {% block title_suffix %}
+      {% wagtail_site as current_site %}
+      {% if current_site and current_site.site_name %}- {{ current_site.site_name }}{% endif %}
+    {% endblock %}
+  </title>
+  <meta name="description" content="" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'favicon/apple-touch-icon.png' %}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon/favicon-32x32.png' %}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon/favicon-16x16.png' %}">
+  <link rel="manifest" href="{% static 'favicon/site.webmanifest' %}">
+
+
+  {# Global stylesheets #}
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montez">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}">
+
+  {% block extra_css %}
+    {# Override this in templates to add extra stylesheets #}
+  {% endblock %}
+</head>
+
+<body class="body {% block body_class %}{% endblock %}">
+{% wagtailuserbar %}
+
+<nav class="navbar" role="navigation" aria-label="main navigation">
+  <div class="navbar-brand">
+    <a class="navbar-item fancy font is-size-4" href="/">
+      <img src="{% static 'img/jackals-logo.png' %}" alt="logo" /> Jackals
+    </a>
+
+    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+  </div>
+  <div id="navbarBasicExample" class="navbar-menu">
+    <div class="navbar-start">
+      <a class="navbar-item" href="/library">
+        Library
+      </a>
+      <a class="navbar-item" href="/events">
+        Events
+      </a>
+    </div>
+  </div>
+</nav>
+
+<main class="main">
+  {% block hero %}{% endblock %}
+
+  <section class="section">
+    <div class="container">
+      <div class="columns">
+        <div class="column is-three-quarters">
+          <div class="content px-4 py-4"style="height:100%">
+            {% block content %}{% endblock %}
+          </div>
+
+        </div>
+        <div class="column">
+          <div class="content px-4 py-4" >
+            <h2 class="title is-size-4 mb-2">Latest Event</h2>
+            {% if latest_event is not null %}
+              <a class="box" href="{% pageurl latest_event %}">
+                <h4 class="title is-5">{{ latest_event.title }}</h4>
+                <p class="help subtitle">{{ latest_event.event_date }}</p>
+              </a>
+            {% else %}
+              <p>
+                No upcoming events
+              </p>
+            {% endif %}
+            <p class="has-text-right">
+              <a class="link" href="/events">See All Events</a>
+            </p>
+          </div>
+          <div class="content px-4 py-4">
+            <h2 class="title is-size-4 mb-2">Library</h2>
+            <p>
+              No content to show
+            </p>
+            <p class="has-text-right">
+              <a class="link" href="/library">Visit Library</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="content has-text-centered">
+    <p>
+      Website under construction - MATT CHANGE THIS!
+    </p>
+  </div>
+</footer>
+
+{# Global javascript #}
+<script type="text/javascript" src="{% static 'js/main.js' %}"></script>
+
+{% block extra_js %}
+  {# Override this in templates to add extra javascript #}
+{% endblock %}
+</body>
+</html>

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% load static wagtailcore_tags %}
+
+{% block body_class %}template-homepage{% endblock %}
+
+{% block hero %}
+  <section class="hero hero-img hero-img-center is-medium" style="background-image:url({% static 'img/southlands-map.png' %})">
+    <div class="hero-body"></div>
+  </section>
+{% endblock %}
+
+{% block content %}
+  {{ page.body|richtext }}
+{% endblock %}

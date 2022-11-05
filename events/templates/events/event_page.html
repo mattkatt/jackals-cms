@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+
+{% load wagtailcore_tags wagtailimages_tags %}
+{% load custom_filters %}
+{% load static %}
+
+{% block body_class %}template-blogpage{% endblock %}
+
+{% block hero %}
+  {% image page.image original as main_image %}
+  <section class="hero hero-img is-medium" style="background-image:url({{ main_image.url }})">
+    <div class="hero-body"></div>
+  </section>
+{% endblock %}
+
+{% block content %}
+  <h1 class="title is-1">{{ page.title }}</h1>
+  <p class="subtitle help">{{ page.event_date }}</p>
+
+  {% with categories=page.categories.all %}
+    {% if categories %}
+      <h3 class="title is-3">Posted in:</h3>
+      <div class="tags is-large">
+        {% for category in categories %}
+          <span class="tag">{{ category.name }}</span>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <div class="intro">{{ page.intro }}</div>
+
+  {{ page.description|richtext }}
+
+  {{ page.details|richtext }}
+
+  {% if page.event_date  %}
+    <h3 class="title is-3">Booking Form</h3>
+
+    <form class="form" id="booking_form" action="/submit-event-booking/" method="post">
+      {% csrf_token %}
+      {{ booking_form.non_field_errors }}
+      <input type="hidden" name="event_id" value="{{ page.id }}" />
+
+      <div class="columns">
+        <div class="column">
+          <div class="field">
+            <label class="label">{{ booking_form.first_name.label_tag }}*</label>
+            <div class="control">
+              {{ booking_form.first_name|addclass:'input' }}
+            </div>
+          </div>
+        </div>
+        <div class="column">
+          <div class="field">
+            <label class="label">{{ booking_form.last_name.label_tag }}*</label>
+            <div class="control">
+              {{ booking_form.last_name|addclass:'input' }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="columns">
+        <div class="column">
+          <div class="field">
+            <label class="label">{{ booking_form.email.label_tag }}*</label>
+            <div class="control">
+              {{ booking_form.email|addclass:'input' }}
+            </div>
+          </div>
+        </div>
+        <div class="column">
+          <div class="field">
+            <label class="label">{{ booking_form.contact_number.label_tag }}*</label>
+            <div class="control">
+              {{ booking_form.contact_number|addclass:'input' }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="columns">
+        <div class="column is-three-quarters">
+          <div class="field">
+            <label class="label">Lorien Trust player ID:</label>
+            <div class="control">
+              {{ booking_form.lt_player_id|addclass:'input' }}
+            </div>
+            <p class="help">{{ booking_form.lt_player_id.help_text }}</p>
+          </div>
+        </div>
+        <div class="column">
+          <div class="field">
+            <label class="label" for="id_player_type">{{ booking_form.player_type.label_tag }}</label>
+            <div class="control">
+              <div class="select is-fullwidth">
+                <select name="player_type" id="id_player_type">
+                  {% for player_choice in booking_form.player_type %}
+                    {% if player_choice.choice_label != 'Staff' %}
+                      {{ player_choice }}
+                    {% endif %}
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <h4 class="is-4">
+          Event Price: <span id="player_cost">£{{ page.player_cost }} (Player)</span>
+                       <span id="monster_cost" class="is-hidden">£{{ page.monster_cost }} (Monster)</span>
+        </h4>
+        <input type="hidden" name="player_cost" id="player_cost_value" value="{{ page.player_cost }}"/>
+        <input type="hidden" name="monster_cost" id="monster_cost_value" value="{{ page.monster_cost }}">
+      </div>
+
+      <div class="columns" id="character_details">
+        <div class="column is-three-quarters">
+          <div class="field">
+            <label class="label">{{ booking_form.character_name.label_tag }}*</label>
+            <p class="control">
+              {{ booking_form.character_name|addclass:'input' }}
+            </p>
+          </div>
+        </div>
+        <div class="column">
+          <div class="field">
+            <label class="label">{{ booking_form.character_faction.label_tag }}*</label>
+            <div class="control">
+              <div class="select is-fullwidth">
+                {{ booking_form.character_faction }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">Catering</label>
+        <p>Our events are catered at a nominal fee, but if you prefer you can manage your own provision. If you wish for
+          us to provide you with food at the event, then please <b>tick below</b> and the cost will be added to the final
+          booking price</p>
+        <div class="control">
+          <label class="checkbox" for="id_is_catering">
+            {{ booking_form.is_catering }} <b>{{ booking_form.is_catering.label }}</b>
+          </label>
+        </div>
+      </div>
+
+      <div class="field">
+        <h4 class="is-4">
+          Catering Cost: <span id="player_catering_cost">£{{ page.player_catering_cost }} (Player)</span><span
+          class="is-hidden" id="monster_catering_cost">£{{ page.monster_catering_cost }} (Monster)</span>
+        </h4>
+        <input type="hidden" name="player_catering_cost" id="player_catering_cost_value" value="{{ page.player_catering_cost }}"/>
+        <input type="hidden" name="monster_catering_cost" id="monster_catering_cost_value" value="{{ page.monster_catering_cost }}">
+      </div>
+
+      <div class="columns">
+        <div class="column">
+          <div class="field">
+            <label class="label">{{ booking_form.emergency_contact_name.label_tag }}*</label>
+            <div class="control">
+              {{ booking_form.emergency_contact_name|addclass:'input' }}
+            </div>
+          </div>
+        </div>
+        <div class="column">
+          <div class="field">
+            <label class="label">{{ booking_form.emergency_contact_number.label_tag }}*</label>
+            <div class="control">
+              {{ booking_form.emergency_contact_number|addclass:'input' }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">{{ booking_form.home_address.label_tag }}</label>
+        <div class="control">
+          {{ booking_form.home_address|addclass:'textarea' }}
+        </div>
+        <p class="help">Please note, we only use this as a form of contact in an emergency, and is not required</p>
+      </div>
+
+      <div class="field">
+        <label class="label">{{ booking_form.medical_information.label_tag }}</label>
+        <div class="control">
+          {{ booking_form.medical_information|addclass:'textarea' }}
+        </div>
+        <p class="help">Please note, we only use this in an emergency, and is not required</p>
+      </div>
+
+      <h3 class="is-3">
+        Total Cost: £<span id="total_cost">{{ page.player_cost }}</span>
+      </h3>
+
+      <div class="field">
+        <div class="control">
+          <input class="button is-link" type="submit" value="Submit">
+        </div>
+        <p class="help">* indicates a required field</p>
+      </div>
+    </form>
+  {% else %}
+    <p><i>This event has concluded and is no longer able to be booked</i></p>
+  {% endif %}
+  <h3 class="title is-3">Attending Characters</h3>
+
+  <p>Character count: {{ page.player_bookings|length }}, Monster count: {{ page.monster_bookings|length }}</p>
+
+  {% if page.player_bookings %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Character</th>
+          <th>Faction</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for player in page.player_bookings %}
+          <tr>
+            <td>{{ player.character_name }}</td>
+            <td>{{ player.get_character_faction_display }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+  {% else %}
+    <p><i>No characters have booked yet - be the first!</i></p>
+  {% endif %}
+
+  <p class="has-text-right"><a href="{{ page.get_parent.url }}">Return to events</a></p>
+{% endblock %}
+
+{% block extra_js %}
+  <script src="{% static 'js/booking-form.js' %}"></script>
+{% endblock %}
