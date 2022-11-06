@@ -3,7 +3,7 @@ from django.db import models
 from django.db.models import Model
 from django.forms import ModelForm, Textarea
 from wagtail.core.fields import RichTextField
-from wagtail.admin.panels import FieldPanel, InlinePanel
+from wagtail.admin.panels import FieldPanel
 from wagtail.models import Orderable, Page
 
 
@@ -87,6 +87,31 @@ class EventBooking(Orderable):
     emergency_contact_number = models.CharField(max_length=15)
     home_address = models.TextField(blank=True)
     medical_information = models.TextField(blank=True)
+
+    panels = [
+        FieldPanel('first_name'),
+        FieldPanel('last_name'),
+        FieldPanel('email'),
+        FieldPanel('contact_number'),
+        FieldPanel('lt_player_id'),
+        FieldPanel('player_type'),
+        FieldPanel('character_name'),
+        FieldPanel('character_faction'),
+        FieldPanel('is_catering'),
+        FieldPanel('emergency_contact_name'),
+        FieldPanel('emergency_contact_number'),
+        FieldPanel('home_address'),
+        FieldPanel('medical_information'),
+    ]
+
+    def __str__(self):
+        booking_str = f"{self.first_name} {self.last_name}"
+
+        if self.character_name:
+            booking_str += f" ({self.character_name} - {self.get_character_faction_display()})"
+
+        booking_str += f" [{self.get_player_type_display()}]"
+        return booking_str
 
 
 class EventBookingForm(ModelForm):

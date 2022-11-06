@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect
+from wagtail.contrib.modeladmin.options import ModelAdmin
 
 from events.models import EventBookingForm, EventPage, EventBooking
 
@@ -27,3 +28,39 @@ def submit_event_booking(request):
         raise e
 
     return HttpResponse(content_type='json')
+
+
+class EventBookingAdmin(ModelAdmin):
+    model = EventBooking
+    base_url_path = 'bookings'
+    menu_icon = 'list-ul'
+    add_to_settings_menu = False
+    exclude_from_explorer = False
+    add_to_admin_menu = False
+    list_display = (
+        'first_name',
+        'last_name',
+        'email',
+        'contact_number',
+        'lt_player_id',
+        'player_type',
+        'character_name',
+        'character_faction',
+        'is_catering',
+    )
+    list_filter = ('event_id', )
+    list_export = (
+        'first_name',
+        'last_name',
+        'email',
+        'contact_number',
+        'lt_player_id',
+        'player_type',
+        'character_name',
+        'character_faction',
+        'is_catering',
+        'emergency_contact_name',
+        'emergency_contact_number',
+        'home_address',
+        'medical_information',
+    )
