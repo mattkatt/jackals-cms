@@ -156,6 +156,8 @@ class EventPage(Page):
         verbose_name='Monster catering cost', default=0, max_digits=4, decimal_places=2
     )
 
+    subpage_types = []
+
     content_panels = Page.content_panels + [
         FieldPanel('event_date'),
         FieldPanel('intro'),
