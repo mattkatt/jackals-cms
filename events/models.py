@@ -115,6 +115,8 @@ class EventBooking(Orderable):
 
 
 class EventBookingForm(ModelForm):
+    error_class = 'is-danger'
+
     class Meta:
         model = EventBooking
         fields = [

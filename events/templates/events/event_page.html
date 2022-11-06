@@ -17,16 +17,15 @@
   <h1 class="title is-1">{{ page.title }}</h1>
   <p class="subtitle help">{{ page.event_date }}</p>
 
-  {% with categories=page.categories.all %}
-    {% if categories %}
-      <h3 class="title is-3">Posted in:</h3>
-      <div class="tags is-large">
-        {% for category in categories %}
-          <span class="tag">{{ category.name }}</span>
-        {% endfor %}
-      </div>
-    {% endif %}
-  {% endwith %}
+  {% if messages %}
+    {% for message in messages %}
+      <article class="message {% if message.tags %}{{ message.tags }}{% endif %}">
+        <div class="message-body">
+          {{ message }}
+        </div>
+      </article>
+    {% endfor %}
+  {% endif %}
 
   <div class="intro">{{ page.intro }}</div>
 
@@ -39,7 +38,13 @@
 
     <form class="form" id="booking_form" action="/submit-event-booking/" method="post">
       {% csrf_token %}
-      {{ booking_form.non_field_errors }}
+
+      {% if booking_form.non_field_errors %}
+        <article class="message is-danger">
+          <div class="message-body">{{ booking_form.non_field_errors }}</div>
+        </article>
+      {% endif %}
+
       <input type="hidden" name="event_id" value="{{ page.id }}" />
 
       <div class="columns">
@@ -49,6 +54,9 @@
             <div class="control">
               {{ booking_form.first_name|addclass:'input' }}
             </div>
+            {% if booking_form.first_name.errors %}
+              <p class="help is-danger">{{ booking_form.first_name.errors }}</p>
+            {% endif %}
           </div>
         </div>
         <div class="column">
@@ -57,6 +65,9 @@
             <div class="control">
               {{ booking_form.last_name|addclass:'input' }}
             </div>
+            {% if booking_form.last_name.errors %}
+              <p class="help is-danger">{{ booking_form.last_name.errors }}</p>
+            {% endif %}
           </div>
         </div>
       </div>
@@ -68,6 +79,9 @@
             <div class="control">
               {{ booking_form.email|addclass:'input' }}
             </div>
+            {% if booking_form.email.errors %}
+              <p class="help is-danger">{{ booking_form.email.errors }}</p>
+            {% endif %}
           </div>
         </div>
         <div class="column">
@@ -76,6 +90,9 @@
             <div class="control">
               {{ booking_form.contact_number|addclass:'input' }}
             </div>
+            {% if booking_form.contact_number.errors %}
+              <p class="help is-danger">{{ booking_form.contact_number.errors }}</p>
+            {% endif %}
           </div>
         </div>
       </div>
@@ -88,6 +105,9 @@
               {{ booking_form.lt_player_id|addclass:'input' }}
             </div>
             <p class="help">{{ booking_form.lt_player_id.help_text }}</p>
+            {% if booking_form.lt_pkayer_id.errors %}
+              <p class="help is-danger">{{ booking_form.lt_player_id.errors }}</p>
+            {% endif %}
           </div>
         </div>
         <div class="column">
@@ -104,6 +124,9 @@
                 </select>
               </div>
             </div>
+            {% if booking_form.player_type.errors %}
+              <p class="help is-danger">{{ booking_form.player_type.errors }}</p>
+            {% endif %}
           </div>
         </div>
       </div>
@@ -121,9 +144,12 @@
         <div class="column is-three-quarters">
           <div class="field">
             <label class="label">{{ booking_form.character_name.label_tag }}*</label>
-            <p class="control">
+            <div class="control">
               {{ booking_form.character_name|addclass:'input' }}
-            </p>
+            </div>
+            {% if booking_form.character_name.errors %}
+              <p class="help is-danger">{{ booking_form.character_name.errors }}</p>
+            {% endif %}
           </div>
         </div>
         <div class="column">
@@ -134,6 +160,9 @@
                 {{ booking_form.character_faction }}
               </div>
             </div>
+            {% if booking_form.character_faction.errors %}
+              <p class="help is-danger">{{ booking_form.character_faction.errors }}</p>
+            {% endif %}
           </div>
         </div>
       </div>
@@ -148,6 +177,9 @@
             {{ booking_form.is_catering }} <b>{{ booking_form.is_catering.label }}</b>
           </label>
         </div>
+        {% if booking_form.is_catering.errors %}
+          <p class="help is-danger">{{ booking_form.is_catering.errors }}</p>
+        {% endif %}
       </div>
 
       <div class="field">
@@ -166,6 +198,9 @@
             <div class="control">
               {{ booking_form.emergency_contact_name|addclass:'input' }}
             </div>
+            {% if booking_form.emergency_contact_name.errors %}
+              <p class="help is-danger">{{ booking_form.emergency_contact_name.errors }}</p>
+            {% endif %}
           </div>
         </div>
         <div class="column">
@@ -174,6 +209,9 @@
             <div class="control">
               {{ booking_form.emergency_contact_number|addclass:'input' }}
             </div>
+            {% if booking_form.emergency_contact_number.errors %}
+              <p class="help is-danger">{{ booking_form.emergency_contact_number.errors }}</p>
+            {% endif %}
           </div>
         </div>
       </div>

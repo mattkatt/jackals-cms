@@ -1,5 +1,6 @@
+from django.contrib import messages
 from django.core.exceptions import ValidationError
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect
+from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from wagtail.contrib.modeladmin.options import ModelAdmin
 
 from events.models import EventBookingForm, EventPage, EventBooking
@@ -16,18 +17,22 @@ def submit_event_booking(request):
         if form.is_valid():
             booking: EventBooking = form.instance
             event = EventPage.objects.get(id=request.POST['event_id'])
-            if event:
-                booking.event = event
-                booking.save()
-                return HttpResponseRedirect(request.path)
+            booking.event = event
+            booking.save()
+            messages.success(request, 'Your booking has been successful! We look forward to seeing you at the event.',
+                             'is-success')
         else:
             raise ValidationError(form.errors)
     except EventPage.DoesNotExist:
+        messages.error(request, 'The event you have tried to book does not exist. If you have paid via paypal, '
+                                'please contact the Jackals Faction for a refund.', 'is-danger')
         raise ValidationError('No such event')
     except Exception as e:
+        messages.error(request, 'There has been an unresolvable error. If you have paid via paypal, please contact '
+                                'the Jackals Faction for a refund.', 'is-danger')
         raise e
 
-    return HttpResponse(content_type='json')
+    return HttpResponseRedirect(event.url)
 
 
 class EventBookingAdmin(ModelAdmin):
