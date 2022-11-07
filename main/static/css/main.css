@@ -9,7 +9,7 @@ main.main {
   flex-grow: 1;
 }
 
-.title, .font.fancy {
+.font.fancy {
   font-family: 'Montez'
 }
 
