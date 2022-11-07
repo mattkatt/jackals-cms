@@ -190,6 +190,14 @@ class EventPage(Page):
         return EventBooking.objects.filter(event=self, player_type=EventBooking.MONSTER)
 
     @property
+    def has_max_players(self):
+        return len(self.player_bookings) >= self.player_limit
+
+    @property
+    def has_max_monsters(self):
+        return len(self.monster_bookings) >= self.monster_limit
+
+    @property
     def is_concluded(self):
         return date.today() >= self.event_date
 
@@ -208,6 +216,8 @@ class EventPage(Page):
 
         context['latest_event'] = latest_event
         context['paypal_client_id'] = settings.PAYPAL_CLIENT_ID
+        context['has_max_players'] = self.has_max_players
+        context['has_max_monsters'] = self.has_max_monsters
         context['is_concluded'] = self.is_concluded
 
         return context

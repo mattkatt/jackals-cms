@@ -89,6 +89,47 @@ document.addEventListener('DOMContentLoaded', () => {
         }).render('#paypal-button-container');
     }
 
+    const calculateCosts = () => {
+        totalCost = isPlayer ? playerCostValue : monsterCostValue;
+
+        if (isCatering) {
+            totalCost += isPlayer ? playerCateringCostValue : monsterCateringCostValue;
+        }
+
+        totalCostDisplay.innerText = totalCost.toFixed(2)
+
+        const element = document.getElementById('paypal-button-container');
+        element.innerHTML = '';
+
+        if (totalCost > 0) {
+            initPayPalButton()
+        } else {
+            element.innerHTML = '<input class="button is-link is-large is-fullwidth" type="submit" value="Submit">';
+        }
+    }
+
+    const initForm = () => {
+        const selector = document.getElementById('id_player_type')
+        switch (selector.value) {
+            case PLAYER:
+                isPlayer = true;
+                show(characterElementArray);
+                hide(monsterElementArray);
+                characterNameInput.required = true;
+                characterFactionInput.required = true;
+                break;
+            case MONSTER:
+                isPlayer = false;
+                hide(characterElementArray)
+                show(monsterElementArray)
+                characterNameInput.required = false;
+                characterFactionInput.required = false;
+                break;
+        }
+
+        calculateCosts()
+    }
+
     bookingForm.addEventListener('change', (evt) => {
         if (evt.target.id === 'id_player_type') {
             switch (evt.target.value) {
@@ -113,23 +154,8 @@ document.addEventListener('DOMContentLoaded', () => {
             isCatering = !!evt.target.checked;
         }
 
-        totalCost = isPlayer ? playerCostValue : monsterCostValue;
-
-        if (isCatering) {
-            totalCost += isPlayer ? playerCateringCostValue : monsterCateringCostValue;
-        }
-
-        totalCostDisplay.innerText = totalCost.toFixed(2)
-
-        const element = document.getElementById('paypal-button-container');
-        element.innerHTML = '';
-
-        if (totalCost > 0) {
-            initPayPalButton()
-        } else {
-            element.innerHTML = '<input class="button is-link is-large is-fullwidth" type="submit" value="Submit">';
-        }
+        calculateCosts()
     })
 
-    initPayPalButton();
+    initForm()
 })
