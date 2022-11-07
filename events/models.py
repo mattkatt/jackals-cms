@@ -1,3 +1,5 @@
+from datetime import date, datetime
+
 from django.apps import apps
 from django.conf import settings
 from django.db import models
@@ -187,6 +189,10 @@ class EventPage(Page):
     def monster_bookings(self):
         return EventBooking.objects.filter(event=self, player_type=EventBooking.MONSTER)
 
+    @property
+    def is_concluded(self):
+        return date.today() >= self.event_date
+
     def get_context(self, request, *args, **kwargs):
         context = super().get_context(request)
         booking_form = EventBookingForm()
@@ -199,7 +205,9 @@ class EventPage(Page):
             latest_event = events.objects.latest('event_date')
         except Page.DoesNotExist:
             latest_event = None
-        context['latest_event'] = latest_event
 
+        context['latest_event'] = latest_event
         context['paypal_client_id'] = settings.PAYPAL_CLIENT_ID
+        context['is_concluded'] = self.is_concluded
+
         return context
