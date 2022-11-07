@@ -1,4 +1,5 @@
 from django.apps import apps
+from django.conf import settings
 from django.db import models
 from django.db.models import Model
 from django.forms import ModelForm, Textarea
@@ -200,4 +201,5 @@ class EventPage(Page):
             latest_event = None
         context['latest_event'] = latest_event
 
+        context['paypal_client_id'] = settings.PAYPAL_CLIENT_ID
         return context

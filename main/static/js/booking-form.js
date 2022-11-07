@@ -1,7 +1,7 @@
 const PLAYER = 'PL'
 const MONSTER = 'MN'
 
-function show(element) {
+const show = (element) => {
     if (Array.isArray(element)) {
         element.forEach(elm => {show(elm)})
     } else {
@@ -9,7 +9,7 @@ function show(element) {
     }
 }
 
-function hide(element) {
+const hide = (element) => {
         if (Array.isArray(element)) {
         element.forEach(elm => {hide(elm)})
     } else {
@@ -41,8 +41,53 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const totalCostDisplay = document.getElementById('total_cost');
 
+    totalCost = playerCostValue;
+
     characterNameInput.required = true;
     characterFactionInput.required = true;
+
+    const initPayPalButton = () => {
+        paypal.Buttons({
+            style: {
+                shape: 'rect',
+                color: 'gold',
+                layout: 'vertical',
+                label: 'paypal',
+            },
+
+            createOrder: function(data, actions) {
+                return actions.order.create({
+                    purchase_units: [{
+                        "description": `Event Booking for ${bookingForm.email.value}`,
+                        "amount":{
+                            "currency_code":"GBP",
+                            "value": totalCost
+                        }
+                    }]
+                });
+            },
+
+            onApprove: function(data, actions) {
+                return actions.order.capture().then(function(orderData) {
+
+                    // Full available details
+                    console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
+
+                    // Show a success message within this page, e.g.
+                    const element = document.getElementById('paypal-button-container');
+                    element.innerHTML = '';
+                    element.innerHTML = '<h3>Thank you for your payment!</h3>';
+
+                    // Or go to another URL:  actions.redirect('thank_you.html');
+                    bookingForm.submit()
+                });
+            },
+
+            onError: function(err) {
+                console.log(err);
+            }
+        }).render('#paypal-button-container');
+    }
 
     bookingForm.addEventListener('change', (evt) => {
         if (evt.target.id === 'id_player_type') {
@@ -75,5 +120,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         totalCostDisplay.innerText = totalCost.toFixed(2)
+
+        const element = document.getElementById('paypal-button-container');
+        element.innerHTML = '';
+
+        if (totalCost > 0) {
+            initPayPalButton()
+        } else {
+            element.innerHTML = '<input class="button is-link is-large is-fullwidth" type="submit" value="Submit">';
+        }
     })
+
+    initPayPalButton();
 })

@@ -238,7 +238,11 @@
 
       <div class="field">
         <div class="control">
-          <input class="button is-link" type="submit" value="Submit">
+          <div id="smart-button-container">
+            <div style="text-align: center;">
+              <div id="paypal-button-container"></div>
+            </div>
+          </div>
         </div>
         <p class="help">* indicates a required field</p>
       </div>
@@ -276,5 +280,6 @@
 {% endblock %}
 
 {% block extra_js %}
+  <script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id }}&enable-funding=venmo&currency=GBP" data-sdk-integration-source="button-factory"></script>
   <script src="{% static 'js/booking-form.js' %}"></script>
 {% endblock %}

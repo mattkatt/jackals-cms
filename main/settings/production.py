@@ -1,3 +1,4 @@
+import os
 import dotenv
 
 from .base import *
@@ -9,6 +10,7 @@ if os.path.isfile(dotenv_file):
 DEBUG = False
 
 SECRET_KEY = os.environ['SECRET_KEY']
+PAYPAL_CLIENT_ID = os.environ['PAYPAL_CLIENT_ID']
 
 ALLOWED_HOSTS = [
     'jackalsfaction.pythonanywhere.com',
