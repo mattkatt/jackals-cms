@@ -14,12 +14,7 @@ main.main {
 }
 
 nav.navbar, footer.footer {
-  color: #ffffff;
-  background-color: #161E29;
-}
-
-nav.navbar a {
-  color: #ffffff;
+  background-color: #161E29 !important;
 }
 
 nav.navbar .navbar-brand img {

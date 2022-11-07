@@ -35,7 +35,7 @@
 <body class="body {% block body_class %}{% endblock %}">
 {% wagtailuserbar %}
 
-<nav class="navbar" role="navigation" aria-label="main navigation">
+<nav class="navbar is-dark" role="navigation" aria-label="main navigation">
   <div class="navbar-brand">
     <a class="navbar-item fancy font is-size-4" href="/">
       <img src="{% static 'img/jackals-logo-inverse.png' %}" alt="logo" /> Jackals
@@ -55,6 +55,9 @@
       <a class="navbar-item" href="/events">
         Events
       </a>
+    </div>
+    <div class="navbar-end">
+
     </div>
   </div>
 </nav>
