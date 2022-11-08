@@ -17,7 +17,8 @@ urlpatterns = [
 
     path('search/', search_views.search, name='search'),
 
-    path('submit-event-booking/', event_views.submit_event_booking)
+    path('validate-booking/', event_views.validate_event_form),
+    path('submit-event-booking/', event_views.submit_event_booking),
 ]
 
 

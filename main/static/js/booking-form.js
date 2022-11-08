@@ -18,9 +18,11 @@ const hide = (element) => {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    // To avoid fractional issues, all values are converted to pennies before final tally
     let totalCost = 0;
     let isPlayer = true;
     let isCatering = false;
+    let formIsValid = false;
 
     const bookingForm = document.getElementById('booking_form')
     const characterDetails = document.getElementById('character_details')
@@ -34,10 +36,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const characterElementArray = [characterDetails, playerCost, playerCateringCost]
     const monsterElementArray = [monsterCost, monsterCateringCost]
 
-    const playerCostValue = parseFloat(document.getElementById('player_cost_value').value);
-    const monsterCostValue = parseFloat(document.getElementById('monster_cost_value').value);
-    const playerCateringCostValue = parseFloat(document.getElementById('player_catering_cost_value').value);
-    const monsterCateringCostValue = parseFloat(document.getElementById('monster_catering_cost_value').value);
+    const playerCostValue = parseFloat(document.getElementById('player_cost_value').value) * 100;
+    const monsterCostValue = parseFloat(document.getElementById('monster_cost_value').value) * 100;
+    const playerCateringCostValue = parseFloat(document.getElementById('player_catering_cost_value').value) * 100;
+    const monsterCateringCostValue = parseFloat(document.getElementById('monster_catering_cost_value').value) * 100;
 
     const totalCostDisplay = document.getElementById('total_cost');
 
@@ -47,46 +49,71 @@ document.addEventListener('DOMContentLoaded', () => {
     characterFactionInput.required = true;
 
     const initPayPalButton = () => {
-        paypal.Buttons({
-            style: {
-                shape: 'rect',
-                color: 'gold',
-                layout: 'vertical',
-                label: 'paypal',
-            },
+        if (formIsValid) {
+            paypal.Buttons({
+                style: {
+                    shape: 'rect',
+                    color: 'gold',
+                    layout: 'vertical',
+                    label: 'paypal',
+                },
 
-            createOrder: function(data, actions) {
-                return actions.order.create({
-                    purchase_units: [{
-                        "description": `Event Booking for ${bookingForm.email.value}`,
-                        "amount":{
-                            "currency_code":"GBP",
-                            "value": totalCost
-                        }
-                    }]
-                });
-            },
+                createOrder: function (data, actions) {
+                    return actions.order.create({
+                        purchase_units: [{
+                            "description": `Event Booking for ${bookingForm.email.value}`,
+                            "amount": {
+                                "currency_code": "GBP",
+                                "value": totalCost / 100
+                            }
+                        }]
+                    });
+                },
 
-            onApprove: function(data, actions) {
-                return actions.order.capture().then(function(orderData) {
+                onApprove: function (data, actions) {
+                    return actions.order.capture().then(function (orderData) {
 
-                    // Full available details
-                    console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
+                        // Full available details
+                        console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
 
-                    // Show a success message within this page, e.g.
-                    const element = document.getElementById('paypal-button-container');
-                    element.innerHTML = '';
-                    element.innerHTML = '<h3>Thank you for your payment!</h3>';
+                        // Show a success message within this page, e.g.
+                        const element = document.getElementById('paypal-button-container');
+                        element.innerHTML = '';
+                        element.innerHTML = '<h3>Thank you for your payment!</h3>';
 
-                    // Or go to another URL:  actions.redirect('thank_you.html');
-                    bookingForm.submit()
-                });
-            },
+                        // Or go to another URL:  actions.redirect('thank_you.html');
+                        bookingForm.submit()
+                    });
+                },
 
-            onError: function(err) {
-                console.log(err);
-            }
-        }).render('#paypal-button-container');
+                onError: function (err) {
+                    console.log(err);
+                }
+            }).render('#paypal-button-container');
+        }
+    }
+
+    const validateForm = () => {
+        fetch('/validate-booking/', {body: new FormData(bookingForm), method: 'POST'})
+            .then(result => {
+                formIsValid = bookingForm.checkValidity();
+                const element = document.getElementById('paypal-button-container');
+                element.innerHTML = '';
+
+                if (formIsValid) {
+                    if (totalCost > 0) {
+                        initPayPalButton()
+                    } else {
+                        element.innerHTML = '<input class="button is-link is-large is-fullwidth" type="submit" value="Submit">';
+                    }
+                } else {
+                    element.innerHTML = '<div class="block has-background-light p-6"><p>Please ensure you have filled in all required fields in order to finish booking</p></div>'
+                }
+            })
+            .catch(error => {
+                formIsValid = false;
+                console.error('FORM VALIDATION ERROR', error.data)
+            })
     }
 
     const calculateCosts = () => {
@@ -96,16 +123,9 @@ document.addEventListener('DOMContentLoaded', () => {
             totalCost += isPlayer ? playerCateringCostValue : monsterCateringCostValue;
         }
 
-        totalCostDisplay.innerText = totalCost.toFixed(2)
+        totalCostDisplay.innerText = (totalCost / 100).toFixed(2)
 
-        const element = document.getElementById('paypal-button-container');
-        element.innerHTML = '';
-
-        if (totalCost > 0) {
-            initPayPalButton()
-        } else {
-            element.innerHTML = '<input class="button is-link is-large is-fullwidth" type="submit" value="Submit">';
-        }
+        validateForm()
     }
 
     const initForm = () => {
