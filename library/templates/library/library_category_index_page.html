@@ -3,8 +3,8 @@
 
 {% block content %}
   <div class="content">
-    {% if request.GET.tag %}
-        <h1 class="title is-1">Tag: "{{ request.GET.tag }}"</h1>
+    {% if request.GET.category %}
+        <h1 class="title is-1">{{ request.GET.category }}</h1>
     {% endif %}
 
     {% for library_page in library_pages %}
@@ -16,7 +16,7 @@
             {% endif %}
         </p>
     {% empty %}
-        No pages found with that tag.
+        No pages found with that category.
     {% endfor %}
   </div>
 {% endblock %}

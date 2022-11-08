@@ -21,11 +21,6 @@ nav.navbar .navbar-brand img {
   margin-right: 6px;
 }
 
-.container .content {
-  background-color: #ffffff;
-  box-shadow: 0 3px 5px 0 rgba(0,0,0,0.25);
-}
-
 .hero.hero-img {
   background-position: center 20%;
   background-size: cover;

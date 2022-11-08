@@ -13,18 +13,32 @@ from wagtail.search import index
 from wagtail.snippets.models import register_snippet
 
 
-class LibraryIndexPage(Page):
-    intro = RichTextField(blank=True)
+@register_snippet
+class LibraryCategory(models.Model):
+    class Meta:
+        verbose_name_plural = 'library categories'
 
-    content_panels = Page.content_panels + [
-        FieldPanel('intro', classname="full")
+    name = models.CharField(max_length=255)
+
+    panels = [
+        FieldPanel('name'),
     ]
 
+    def __str__(self):
+        return self.name
+
+
+class LibraryCategoryIndexPage(Page):
     def get_context(self, request, *args, **kwargs):
-        # Update context to include only published posts, ordered by reverse-chron
+        # filter by cat
+        category = request.GET.get('category')
+        library_pages = LibraryPage.objects.filter(categories__name=category)
+
         context = super().get_context(request)
-        library_pages = self.get_children().live().order_by('title')
         context['library_pages'] = library_pages
+
+        library_categories = LibraryCategory.objects.all()
+        context['library_categories'] = library_categories
 
         try:
             events: Page = apps.get_model(app_label='events', model_name='EventPage')
@@ -36,27 +50,31 @@ class LibraryIndexPage(Page):
         return context
 
 
-@register_snippet
-class LibraryCategory(models.Model):
-    class Meta:
-        verbose_name_plural = 'library categories'
+class LibraryIndexPage(Page):
+    intro = RichTextField(blank=True)
 
-    name = models.CharField(max_length=255)
-    icon = models.ForeignKey(
-        'wagtailimages.Image',
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name='+'
-    )
-
-    panels = [
-        FieldPanel('name'),
-        FieldPanel('icon'),
+    content_panels = Page.content_panels + [
+        FieldPanel('intro', classname="full")
     ]
 
-    def __str__(self):
-        return self.name
+    def get_context(self, request, *args, **kwargs):
+        # Update context to include only published posts, ordered by reverse-chron
+        context = super().get_context(request)
+
+        library_pages = self.get_children().live().order_by('title')
+        context['library_pages'] = library_pages
+
+        library_categories = LibraryCategory.objects.all()
+        context['library_categories'] = library_categories
+
+        try:
+            events: Page = apps.get_model(app_label='events', model_name='EventPage')
+            latest_event = events.objects.latest('event_date')
+        except Page.DoesNotExist:
+            latest_event = None
+        context['latest_event'] = latest_event
+
+        return context
 
 
 class LibraryPageTag(TaggedItemBase):
@@ -76,6 +94,9 @@ class LibraryTagIndexPage(Page):
         # Update template context
         context = super().get_context(request)
         context['library_pages'] = library_pages
+
+        library_categories = LibraryCategory.objects.all()
+        context['library_categories'] = library_categories
 
         try:
             events: Page = apps.get_model(app_label='events', model_name='EventPage')
@@ -119,6 +140,9 @@ class LibraryPage(Page):
 
     def get_context(self, request, *args, **kwargs):
         context = super().get_context(request)
+
+        library_categories = LibraryCategory.objects.all()
+        context['library_categories'] = library_categories
 
         try:
             events: Page = apps.get_model(app_label='events', model_name='EventPage')

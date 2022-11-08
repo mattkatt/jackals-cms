@@ -5,42 +5,74 @@
 {% block body_class %}template-blogpage{% endblock %}
 
 {% block content %}
-  <h1 class="title is-1">{{ page.title }}</h1>
-  <p class="meta">{{ page.date }}</p>
+  {% if self.get_ancestors|length > 1 %}
+    <nav class="breadcrumb" aria-label="breadcrumbs">
+      <ul>
+        {% for root_page in self.get_ancestors %}
+          {% if root_page.is_root == False and root_page.url != '/' %}
+            <li><a href={% pageurl root_page %}>{{ root_page.title }}</a></li>
+          {% endif %}
+        {% endfor %}
 
-  {% with categories=page.categories.all %}
-    {% if categories %}
-      <h3 class="title is-3">Posted in:</h3>
-      <div class="tags is-large">
-        {% for category in categories %}
-          <span class="tag">{{ category.name }}</span>
+        <li class=”is-active”><a href="#">{{ self.title }}</a></li>
+      </ul>
+    </nav>
+  {% endif %}
+
+  <div class="content">
+    <h1 class="title is-1">{{ page.title }}</h1>
+
+    {% with categories=page.categories.all %}
+      {% if categories %}
+        <div class="tags are-large">
+          {% for category in categories %}
+            <a class="tag is-info is-link" href="{% slugurl 'categories' %}?category={{ category }}">
+              {{ category.name }}
+            </a>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <p class="intro">{{ page.intro }}</p>
+
+    {{ page.body|richtext }}
+
+    {% for item in page.gallery_images.all %}
+      <div>
+        {% image item.image fill-320x240 %}
+        <p>{{ item.caption }}</p>
+      </div>
+    {% endfor %}
+
+    {% if page.tags.all.count %}
+      <h4 class="title is-4">Tags</h4>
+      <div class="tags">
+        {% for tag in page.tags.all %}
+          <a class="tag is-rounded" href="{% slugurl 'tags' %}?tag={{ tag }}">
+            {{ tag }}
+          </a>
         {% endfor %}
       </div>
     {% endif %}
-  {% endwith %}
 
-  <div class="intro">{{ page.intro }}</div>
+    {% if page.get_children %}
+      <h3 class="title is-4">Child Pages</h3>
+      <ul>
+        {% for child_page in page.get_children %}
+          <li>
+            <a href="{% pageurl child_page %}">{{ child_page.title }}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
 
-  {{ page.body|richtext }}
-
-  {% for item in page.gallery_images.all %}
-    <div>
-      {% image item.image fill-320x240 %}
-      <p>{{ item.caption }}</p>
+    <div class="block">
+      <p>
+        <a href="{{ page.get_parent.url }}">Return to {{ page.get_parent.title }}</a>
+      </p>
     </div>
-  {% endfor %}
 
-  {% if page.tags.all.count %}
-    <h3 class="title is-3">Tags</h3>
-    <div class="tags">
-      {% for tag in page.tags.all %}
-        <a href="{% slugurl 'tags' %}?tag={{ tag }}">
-          <span class="tag">{{ tag }}</span>
-        </a>
-      {% endfor %}
-    </div>
-  {% endif %}
-
-  <p><a href="{{ page.get_parent.url }}">Return to library</a></p>
+  </div>
 
 {% endblock %}
