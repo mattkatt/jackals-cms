@@ -17,6 +17,8 @@ class EventsIndexPage(Page):
         FieldPanel('intro', classname="full")
     ]
 
+    subpage_types = ['events.EventPage', ]
+
     def get_context(self, request, *args, **kwargs):
         context = super().get_context(request)
         events = self.get_children().live()

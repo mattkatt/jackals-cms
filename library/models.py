@@ -29,6 +29,8 @@ class LibraryCategory(models.Model):
 
 
 class LibraryCategoryIndexPage(Page):
+    subpage_types = []
+
     def get_context(self, request, *args, **kwargs):
         context = super().get_context(request)
 
@@ -62,6 +64,8 @@ class LibraryIndexPage(Page):
     content_panels = Page.content_panels + [
         FieldPanel('intro', classname="full")
     ]
+
+    subpage_types = ['library.LibraryPage', ]
 
     def get_context(self, request, *args, **kwargs):
         # Update context to include only published posts, ordered by reverse-chron
@@ -97,6 +101,8 @@ class LibraryPageTag(TaggedItemBase):
 
 
 class LibraryTagIndexPage(Page):
+    subpage_types = []
+
     def get_context(self, request, *args, **kwargs):
         context = super().get_context(request)
 
@@ -129,6 +135,8 @@ class LibraryPage(Page):
     body = RichTextField(blank=True)
     tags = ClusterTaggableManager(through=LibraryPageTag, blank=True)
     categories = ParentalManyToManyField('library.LibraryCategory', blank=True)
+
+    subpage_types = ['library.LibraryPage']
 
     def main_image(self):
         gallery_item = self.gallery_images.first()

@@ -11,6 +11,13 @@ class HomePage(Page):
         FieldPanel('body', classname="full")
     ]
 
+    subpage_types = [
+        'events.EventsIndexPage',
+        'library.LibraryIndexPage',
+        'library.LibraryCategoryIndexPage',
+        'library.LibraryTagIndexPage',
+    ]
+
     def get_context(self, request, *args, **kwargs):
         context = super().get_context(request)
 
