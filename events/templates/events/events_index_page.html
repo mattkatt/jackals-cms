@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load wagtailcore_tags wagtailimages_tags%}
+{% load wagtailcore_tags wagtailimages_tags %}
 
 {% block body_class %}template-eventsindexpage{% endblock %}
 
@@ -15,18 +15,18 @@
     {% for event in events %}
       {% with event=event.specific %}
         <a class="box" href="{% pageurl event %}">
-        <div class="media">
-          <div class="media-left is-hidden-mobile">
-            <figure class="image is-128x128">
-              {% image event.image fill-128x128 %}
-            </figure>
+          <div class="media">
+            <div class="media-left is-hidden-mobile">
+              <figure class="image is-128x128">
+                {% image event.image fill-128x128 %}
+              </figure>
+            </div>
+            <div class="media-content">
+              <h2 class="title is-2">{{ event.title }}</h2>
+              <p class="subtitle help">{{ event.event_date }}</p>
+              <p>{{ event.intro|richtext }}</p>
+            </div>
           </div>
-          <div class="media-content">
-            <h2 class="title is-2">{{ event.title }}</h2>
-            <p class="subtitle help">{{ event.event_date }}</p>
-            <p>{{ event.intro|richtext }}</p>
-          </div>
-        </div>
         </a>
       {% endwith %}
     {% endfor %}

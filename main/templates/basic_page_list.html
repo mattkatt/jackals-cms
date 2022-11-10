@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block content %}
+  <div class="content">
+    {% block list_title %}{% endblock %}
+
+    {% for library_page in library_pages %}
+      <a class="box" href="{% pageurl library_page %}">
+        <div class="media">
+          {% if library_page.main_image %}
+          <div class="media-left is-hidden-mobile">
+            <figure class="image is-128x128">
+              {% image library_page.main_image fill-128x128 %}
+            </figure>
+          </div>
+          {% endif %}
+          <div class="media-content">
+            <h2 class="title is-2">{{ library_page.title }}</h2>
+            <p>{{ library_page.intro|richtext }}</p>
+          </div>
+        </div>
+      </a>
+    {% empty %}
+      {% block empty_message %}{% endblock %}
+    {% endfor %}
+  </div>
+{% endblock %}
