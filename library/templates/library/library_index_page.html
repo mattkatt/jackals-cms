@@ -15,7 +15,7 @@
         {% with page=library_page.specific %}
           <div class="column is-half">
             <h2 class="title is-h2"><a href="{% pageurl page %}">{{ page.title }}</a></h2>
-            <p class="subtitle">{{ page.intro }}</p>
+            <p class="subtitle is-italic is-size-5">{{ page.intro }}</p>
             {% if library_page.get_children %}
               <ul>
                 {% for child_page in library_page.get_children %}
