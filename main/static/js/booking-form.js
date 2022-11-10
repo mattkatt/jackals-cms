@@ -94,25 +94,56 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const validateForm = () => {
+        [...bookingForm.elements].forEach(field => {
+            if (field.classList.contains('is-danger')) {
+                field.classList.remove('is-danger');
+                const validationErrorMessage = field.parentElement.querySelector('.fetch-validation-error')
+                if (validationErrorMessage) {
+                    validationErrorMessage.remove()
+                }
+            }
+        })
+
         fetch('/validate-booking/', {body: new FormData(bookingForm), method: 'POST'})
-            .then(result => {
-                formIsValid = bookingForm.checkValidity();
-                const element = document.getElementById('paypal-button-container');
-                element.innerHTML = '';
+            .then(response => {
+                const buttonContainer = document.getElementById('paypal-button-container');
+                buttonContainer.innerHTML = '';
+
+                if (!response.ok) {
+                    formIsValid = false;
+                    response.json().then(json => {
+                        Object.keys(json).forEach(key => {
+                            const field_errors = json[key]
+                            field_errors.forEach(field_error => {
+                                if (field_error.code !== 'required') {
+                                    const field = bookingForm[key];
+                                    field.classList.add('is-danger')
+                                    const ErrorNode = document.createElement('div');
+                                    ErrorNode.classList.add('help', 'is-danger', 'fetch-validation-error')
+                                    ErrorNode.innerText = field_error.message;
+                                    field.parentElement.appendChild(ErrorNode)
+                                }
+                            })
+                        })
+                    })
+                } else {
+                    formIsValid = bookingForm.checkValidity();
+                }
 
                 if (formIsValid) {
                     if (totalCost > 0) {
                         initPayPalButton()
                     } else {
-                        element.innerHTML = '<input class="button is-link is-large is-fullwidth" type="submit" value="Submit">';
+                        buttonContainer.innerHTML = '<input class="button is-link is-large is-fullwidth" type="submit" value="Submit">';
                     }
                 } else {
-                    element.innerHTML = '<div class="block has-background-light p-6"><p>Please ensure you have filled in all required fields in order to finish booking</p></div>'
+                    buttonContainer.innerHTML = '<div class="block has-background-light p-6"><p>Please ensure you have filled in all required fields in order to finish booking</p></div>'
                 }
             })
             .catch(error => {
                 formIsValid = false;
-                console.error('FORM VALIDATION ERROR', error.data)
+                console.error('ERROR - The following error occurred:', error)
+                console.error('Please contact Jackals Faction staff with more details')
             })
     }
 

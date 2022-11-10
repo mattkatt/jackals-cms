@@ -70,15 +70,21 @@ class EventBooking(Orderable):
 
     event = models.ForeignKey('EventPage', on_delete=models.PROTECT)
 
-    first_name = models.CharField(max_length=255, validators=[RegexValidator('[\\D]')])
-    last_name = models.CharField(max_length=255, validators=[RegexValidator('[\\D]')])
+    first_name = models.CharField(
+        max_length=255, validators=[RegexValidator('^[\\D]*$', message='First name must contain non-digit characters')]
+    )
+    last_name = models.CharField(
+        max_length=255, validators=[RegexValidator('^[\\D]*$', message='Last name must contain non-digit characters')]
+    )
     email = models.EmailField(validators=[EmailValidator()])
-    contact_number = models.CharField(max_length=15, validators=[RegexValidator('[\\d]')])
+    contact_number = models.CharField(
+        max_length=15, validators=[RegexValidator('^\\+?[\\d-]*$', message='Must be valid phone number format')]
+    )
 
     lt_player_id = models.CharField(
         max_length=15, blank=True, null=True,
         help_text='Required if you have an existing Lorien Trust character (otherwise no blue gold for you!)',
-        validators=[RegexValidator('[\\d]')]
+        validators=[RegexValidator('[\\d]', message='Must be valid Lorien Trust Player ID')]
     )
     player_type = models.CharField(max_length=2, choices=PLAYER_TYPES, default=PLAYER)
 
@@ -86,8 +92,12 @@ class EventBooking(Orderable):
     character_faction = models.CharField(max_length=1, choices=FACTIONS, blank=True, null=True)
 
     is_catering = models.BooleanField(verbose_name='YES, I want food!', default=False)
-    emergency_contact_name = models.CharField(max_length=255, validators=[RegexValidator('[\\D]')])
-    emergency_contact_number = models.CharField(max_length=15, validators=[RegexValidator('[\\d]')])
+    emergency_contact_name = models.CharField(
+        max_length=255, validators=[RegexValidator('^[\\D]*$', message='Must contain only non-digit characters')]
+    )
+    emergency_contact_number = models.CharField(
+        max_length=15, validators=[RegexValidator('^\\+?[\\d-]*$', message='Must be valid phone number format')]
+    )
     home_address = models.TextField(blank=True)
     medical_information = models.TextField(blank=True)
 
