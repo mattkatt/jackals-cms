@@ -161,6 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const initForm = () => {
         const selector = document.getElementById('id_player_type')
+
         switch (selector.value) {
             case PLAYER:
                 isPlayer = true;

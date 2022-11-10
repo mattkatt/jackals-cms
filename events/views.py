@@ -38,18 +38,17 @@ def submit_event_booking(request):
         return HttpResponseBadRequest('Method not allowed')
 
     form = EventBookingForm(request.POST)
+    event = EventPage.objects.get(id=request.POST['event_id'])
 
     try:
         booking: EventBooking = form.instance
-        event = EventPage.objects.get(id=request.POST['event_id'])
         booking.event = event
         booking.save()
         messages.success(request, 'Your booking has been successful! We look forward to seeing you at the event.',
                          'is-success')
-    except Exception as e:
+    except:
         messages.error(request, 'There has been an unresolvable error. If you have paid via paypal, please contact '
                                 'the Jackals Faction for a refund.', 'is-danger')
-        raise e
 
     return HttpResponseRedirect(event.url)
 
