@@ -70,8 +70,8 @@ class EventBooking(Orderable):
 
     event = models.ForeignKey('EventPage', on_delete=models.PROTECT)
 
-    first_name = models.CharField(max_length=255, validators=[RegexValidator('[\\w]')])
-    last_name = models.CharField(max_length=255, validators=[RegexValidator('[\\w]')])
+    first_name = models.CharField(max_length=255, validators=[RegexValidator('[\\D]')])
+    last_name = models.CharField(max_length=255, validators=[RegexValidator('[\\D]')])
     email = models.EmailField(validators=[EmailValidator()])
     contact_number = models.CharField(max_length=15, validators=[RegexValidator('[\\d]')])
 
@@ -86,7 +86,7 @@ class EventBooking(Orderable):
     character_faction = models.CharField(max_length=1, choices=FACTIONS, blank=True, null=True)
 
     is_catering = models.BooleanField(verbose_name='YES, I want food!', default=False)
-    emergency_contact_name = models.CharField(max_length=255, validators=[RegexValidator('[\\w]')])
+    emergency_contact_name = models.CharField(max_length=255, validators=[RegexValidator('[\\D]')])
     emergency_contact_number = models.CharField(max_length=15, validators=[RegexValidator('[\\d]')])
     home_address = models.TextField(blank=True)
     medical_information = models.TextField(blank=True)
