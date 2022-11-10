@@ -10,7 +10,7 @@
   <p class="intro">{{ page.intro|richtext }}</p>
 
   <div class="block">
-    <div class="columns">
+    <div class="columns is-multiline">
       {% for library_page in library_pages %}
         {% with page=library_page.specific %}
           <div class="column is-half">
