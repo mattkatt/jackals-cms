@@ -1,7 +1,7 @@
 from datetime import date
 
 from django.conf import settings
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, RegexValidator, EmailValidator
 from django.db import models
 from django.db.models import Model
 from django.forms import ModelForm, Textarea
@@ -70,14 +70,15 @@ class EventBooking(Orderable):
 
     event = models.ForeignKey('EventPage', on_delete=models.PROTECT)
 
-    first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
-    email = models.EmailField()
-    contact_number = models.CharField(max_length=15)
+    first_name = models.CharField(max_length=255, validators=[RegexValidator('[\\w]')])
+    last_name = models.CharField(max_length=255, validators=[RegexValidator('[\\w]')])
+    email = models.EmailField(validators=[EmailValidator()])
+    contact_number = models.CharField(max_length=15, validators=[RegexValidator('[\\d]')])
 
     lt_player_id = models.CharField(
         max_length=15, blank=True, null=True,
-        help_text='Required if you have an existing Lorien Trust character (otherwise no blue gold for you!)'
+        help_text='Required if you have an existing Lorien Trust character (otherwise no blue gold for you!)',
+        validators=[RegexValidator('[\\d]')]
     )
     player_type = models.CharField(max_length=2, choices=PLAYER_TYPES, default=PLAYER)
 
@@ -85,8 +86,8 @@ class EventBooking(Orderable):
     character_faction = models.CharField(max_length=1, choices=FACTIONS, blank=True, null=True)
 
     is_catering = models.BooleanField(verbose_name='YES, I want food!', default=False)
-    emergency_contact_name = models.CharField(max_length=255)
-    emergency_contact_number = models.CharField(max_length=15)
+    emergency_contact_name = models.CharField(max_length=255, validators=[RegexValidator('[\\w]')])
+    emergency_contact_number = models.CharField(max_length=15, validators=[RegexValidator('[\\d]')])
     home_address = models.TextField(blank=True)
     medical_information = models.TextField(blank=True)
 
@@ -158,10 +159,12 @@ class EventPage(Page):
         verbose_name='Monster cost', default=0, max_digits=4, decimal_places=2, validators=[MinValueValidator(0)]
     )
     player_catering_cost = models.DecimalField(
-        verbose_name='Player catering cost', default=0, max_digits=4, decimal_places=2, validators=[MinValueValidator(0)]
+        verbose_name='Player catering cost', default=0, max_digits=4, decimal_places=2,
+        validators=[MinValueValidator(0)]
     )
     monster_catering_cost = models.DecimalField(
-        verbose_name='Monster catering cost', default=0, max_digits=4, decimal_places=2, validators=[MinValueValidator(0)]
+        verbose_name='Monster catering cost', default=0, max_digits=4, decimal_places=2,
+        validators=[MinValueValidator(0)]
     )
 
     subpage_types = []
