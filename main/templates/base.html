@@ -96,9 +96,9 @@
           <div class="box px-4 py-4">
             <h2 class="title is-size-4 mb-2">The Library</h2>
             <div class="panel">
-              {% for library_page in library_categories %}
-              <a class="panel-block" href="/categories/?category={{ category }}">
-                {{ category }}
+              {% for page in library_areas %}
+              <a class="panel-block" href="{{ page.url }}">
+                {{ page.title }}
               </a>
               {% endfor %}
             </div>

@@ -30,22 +30,28 @@ class LibraryCategory(models.Model):
 
 class LibraryCategoryIndexPage(Page):
     def get_context(self, request, *args, **kwargs):
+        context = super().get_context(request)
+
         # filter by cat
         category = request.GET.get('category')
         library_pages = LibraryPage.objects.filter(categories__name=category)
-
-        context = super().get_context(request)
         context['library_pages'] = library_pages
-
-        library_categories = LibraryCategory.objects.all()
-        context['library_categories'] = library_categories
 
         try:
             events: Page = apps.get_model(app_label='events', model_name='EventPage')
             latest_event = events.objects.latest('event_date')
         except Page.DoesNotExist:
             latest_event = None
+
         context['latest_event'] = latest_event
+
+        try:
+            library_index = apps.get_model(app_label='library', model_name='LibraryIndexPage')
+            library_first_level_children = library_index.objects.first().get_children()
+        except Page.DoesNotExist:
+            library_first_level_children = None
+
+        context['library_areas'] = library_first_level_children
 
         return context
 
@@ -64,15 +70,20 @@ class LibraryIndexPage(Page):
         library_pages = self.get_children().live().order_by('title')
         context['library_pages'] = library_pages
 
-        library_categories = LibraryCategory.objects.all()
-        context['library_categories'] = library_categories
-
         try:
             events: Page = apps.get_model(app_label='events', model_name='EventPage')
             latest_event = events.objects.latest('event_date')
         except Page.DoesNotExist:
             latest_event = None
         context['latest_event'] = latest_event
+
+        try:
+            library_index = apps.get_model(app_label='library', model_name='LibraryIndexPage')
+            library_first_level_children = library_index.objects.first().get_children()
+        except Page.DoesNotExist:
+            library_first_level_children = None
+
+        context['library_areas'] = library_first_level_children
 
         return context
 
@@ -87,16 +98,12 @@ class LibraryPageTag(TaggedItemBase):
 
 class LibraryTagIndexPage(Page):
     def get_context(self, request, *args, **kwargs):
+        context = super().get_context(request)
+
         # Filter by tag
         tag = request.GET.get('tag')
         library_pages = LibraryPage.objects.filter(tags__name=tag)
-
-        # Update template context
-        context = super().get_context(request)
         context['library_pages'] = library_pages
-
-        library_categories = LibraryCategory.objects.all()
-        context['library_categories'] = library_categories
 
         try:
             events: Page = apps.get_model(app_label='events', model_name='EventPage')
@@ -104,6 +111,14 @@ class LibraryTagIndexPage(Page):
         except Page.DoesNotExist:
             latest_event = None
         context['latest_event'] = latest_event
+
+        try:
+            library_index = apps.get_model(app_label='library', model_name='LibraryIndexPage')
+            library_first_level_children = library_index.objects.first().get_children()
+        except Page.DoesNotExist:
+            library_first_level_children = None
+
+        context['library_areas'] = library_first_level_children
 
         return context
 
@@ -141,15 +156,20 @@ class LibraryPage(Page):
     def get_context(self, request, *args, **kwargs):
         context = super().get_context(request)
 
-        library_categories = LibraryCategory.objects.all()
-        context['library_categories'] = library_categories
-
         try:
             events: Page = apps.get_model(app_label='events', model_name='EventPage')
             latest_event = events.objects.latest('event_date')
         except Page.DoesNotExist:
             latest_event = None
         context['latest_event'] = latest_event
+
+        try:
+            library_index = apps.get_model(app_label='library', model_name='LibraryIndexPage')
+            library_first_level_children = library_index.objects.first().get_children()
+        except Page.DoesNotExist:
+            library_first_level_children = None
+
+        context['library_areas'] = library_first_level_children
 
         return context
 

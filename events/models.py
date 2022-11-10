@@ -29,6 +29,14 @@ class EventsIndexPage(Page):
             latest_event = None
         context['latest_event'] = latest_event
 
+        try:
+            library_index = apps.get_model(app_label='library', model_name='LibraryIndexPage')
+            library_first_level_children = library_index.objects.first().get_children()
+        except Page.DoesNotExist:
+            library_first_level_children = None
+
+        context['library_areas'] = library_first_level_children
+
         return context
 
 
@@ -207,6 +215,10 @@ class EventPage(Page):
         context['booking_form'] = booking_form
         context['player_bookings'] = self.player_bookings
         context['monster_bookings'] = self.monster_bookings
+        context['paypal_client_id'] = settings.PAYPAL_CLIENT_ID
+        context['has_max_players'] = self.has_max_players
+        context['has_max_monsters'] = self.has_max_monsters
+        context['is_concluded'] = self.is_concluded
 
         try:
             events: Page = apps.get_model(app_label='events', model_name='EventPage')
@@ -215,9 +227,13 @@ class EventPage(Page):
             latest_event = None
 
         context['latest_event'] = latest_event
-        context['paypal_client_id'] = settings.PAYPAL_CLIENT_ID
-        context['has_max_players'] = self.has_max_players
-        context['has_max_monsters'] = self.has_max_monsters
-        context['is_concluded'] = self.is_concluded
+
+        try:
+            library_index = apps.get_model(app_label='library', model_name='LibraryIndexPage')
+            library_first_level_children = library_index.objects.first().get_children()
+        except Page.DoesNotExist:
+            library_first_level_children = None
+
+        context['library_areas'] = library_first_level_children
 
         return context

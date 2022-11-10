@@ -4,19 +4,19 @@
 {% block content %}
   <div class="content">
     {% if request.GET.category %}
-        <h1 class="title is-1">{{ request.GET.category }}</h1>
+      <h1 class="title is-1">{{ request.GET.category }}</h1>
     {% endif %}
 
     {% for library_page in library_pages %}
-        <p>
-            <strong><a href="{% pageurl library_page %}">{{ library_page.title }}</a></strong><br />
-            <small>Revised: {{ library_page.latest_revision_created_at }}</small><br />
-            {% if library_page.author %}
-                <p>By {{ library_page.author.profile }}</p>
-            {% endif %}
-        </p>
+      <p>
+        <strong><a href="{% pageurl library_page %}">{{ library_page.title }}</a></strong><br />
+        <small>Revised: {{ library_page.latest_revision_created_at }}</small><br />
+        {% if library_page.author %}
+          <p>By {{ library_page.author.profile }}</p>
+        {% endif %}
+      </p>
     {% empty %}
-        No pages found with that category.
+      No pages found with that category.
     {% endfor %}
   </div>
 {% endblock %}
