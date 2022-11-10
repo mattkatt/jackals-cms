@@ -1,6 +1,7 @@
 from datetime import date
 
 from django.conf import settings
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import Model
 from django.forms import ModelForm, Textarea
@@ -148,15 +149,19 @@ class EventPage(Page):
     description = RichTextField(blank=True)
     details = RichTextField(blank=True)
     image = models.ForeignKey('wagtailimages.Image', on_delete=models.SET_NULL, null=True, related_name='+')
-    player_limit = models.IntegerField(default=0)
-    monster_limit = models.IntegerField(default=0)
-    player_cost = models.DecimalField(verbose_name='Player cost', default=0, max_digits=4, decimal_places=2)
-    monster_cost = models.DecimalField(verbose_name='Monster cost', default=0, max_digits=4, decimal_places=2)
+    player_limit = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    monster_limit = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    player_cost = models.DecimalField(
+        verbose_name='Player cost', default=0, max_digits=4, decimal_places=2, validators=[MinValueValidator(0)]
+    )
+    monster_cost = models.DecimalField(
+        verbose_name='Monster cost', default=0, max_digits=4, decimal_places=2, validators=[MinValueValidator(0)]
+    )
     player_catering_cost = models.DecimalField(
-        verbose_name='Player catering cost', default=0, max_digits=4, decimal_places=2
+        verbose_name='Player catering cost', default=0, max_digits=4, decimal_places=2, validators=[MinValueValidator(0)]
     )
     monster_catering_cost = models.DecimalField(
-        verbose_name='Monster catering cost', default=0, max_digits=4, decimal_places=2
+        verbose_name='Monster catering cost', default=0, max_digits=4, decimal_places=2, validators=[MinValueValidator(0)]
     )
 
     subpage_types = []
