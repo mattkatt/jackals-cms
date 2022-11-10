@@ -5,7 +5,7 @@ from wagtail.models import Page
 def append_sidebar_to_context(context):
     try:
         events: Page = apps.get_model(app_label='events', model_name='EventPage')
-        latest_event = events.objects.latest('event_date')
+        latest_event = events.objects.filter(live=True).latest('event_date')
     except Page.DoesNotExist:
         latest_event = None
 
