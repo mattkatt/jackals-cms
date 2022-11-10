@@ -1,6 +1,5 @@
-from datetime import date, datetime
+from datetime import date
 
-from django.apps import apps
 from django.conf import settings
 from django.db import models
 from django.db.models import Model
@@ -8,6 +7,8 @@ from django.forms import ModelForm, Textarea
 from wagtail.core.fields import RichTextField
 from wagtail.admin.panels import FieldPanel
 from wagtail.models import Orderable, Page
+
+from main.helper_methods import append_sidebar_to_context
 
 
 class EventsIndexPage(Page):
@@ -24,20 +25,7 @@ class EventsIndexPage(Page):
         events = self.get_children().live()
         context['events'] = events
 
-        try:
-            events: Page = apps.get_model(app_label='events', model_name='EventPage')
-            latest_event = events.objects.latest('event_date')
-        except Page.DoesNotExist:
-            latest_event = None
-        context['latest_event'] = latest_event
-
-        try:
-            library_index = apps.get_model(app_label='library', model_name='LibraryIndexPage')
-            library_first_level_children = library_index.objects.first().get_children()
-        except Page.DoesNotExist:
-            library_first_level_children = None
-
-        context['library_areas'] = library_first_level_children
+        append_sidebar_to_context(context)
 
         return context
 
@@ -222,20 +210,6 @@ class EventPage(Page):
         context['has_max_monsters'] = self.has_max_monsters
         context['is_concluded'] = self.is_concluded
 
-        try:
-            events: Page = apps.get_model(app_label='events', model_name='EventPage')
-            latest_event = events.objects.latest('event_date')
-        except Page.DoesNotExist:
-            latest_event = None
-
-        context['latest_event'] = latest_event
-
-        try:
-            library_index = apps.get_model(app_label='library', model_name='LibraryIndexPage')
-            library_first_level_children = library_index.objects.first().get_children()
-        except Page.DoesNotExist:
-            library_first_level_children = None
-
-        context['library_areas'] = library_first_level_children
+        append_sidebar_to_context(context)
 
         return context

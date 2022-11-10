@@ -1,7 +1,6 @@
 import datetime
 
 from django import forms
-from django.apps import apps
 from django.db import models
 from modelcluster.fields import ParentalKey, ParentalManyToManyField
 from modelcluster.contrib.taggit import ClusterTaggableManager
@@ -11,6 +10,8 @@ from wagtail.core.fields import RichTextField
 from wagtail.admin.panels import FieldPanel, InlinePanel, MultiFieldPanel
 from wagtail.search import index
 from wagtail.snippets.models import register_snippet
+
+from main.helper_methods import append_sidebar_to_context
 
 
 @register_snippet
@@ -39,21 +40,7 @@ class LibraryCategoryIndexPage(Page):
         library_pages = LibraryPage.objects.filter(categories__name=category)
         context['library_pages'] = library_pages
 
-        try:
-            events: Page = apps.get_model(app_label='events', model_name='EventPage')
-            latest_event = events.objects.latest('event_date')
-        except Page.DoesNotExist:
-            latest_event = None
-
-        context['latest_event'] = latest_event
-
-        try:
-            library_index = apps.get_model(app_label='library', model_name='LibraryIndexPage')
-            library_first_level_children = library_index.objects.first().get_children()
-        except Page.DoesNotExist:
-            library_first_level_children = None
-
-        context['library_areas'] = library_first_level_children
+        append_sidebar_to_context(context)
 
         return context
 
@@ -74,20 +61,7 @@ class LibraryIndexPage(Page):
         library_pages = self.get_children().live().order_by('title')
         context['library_pages'] = library_pages
 
-        try:
-            events: Page = apps.get_model(app_label='events', model_name='EventPage')
-            latest_event = events.objects.latest('event_date')
-        except Page.DoesNotExist:
-            latest_event = None
-        context['latest_event'] = latest_event
-
-        try:
-            library_index = apps.get_model(app_label='library', model_name='LibraryIndexPage')
-            library_first_level_children = library_index.objects.first().get_children()
-        except Page.DoesNotExist:
-            library_first_level_children = None
-
-        context['library_areas'] = library_first_level_children
+        append_sidebar_to_context(context)
 
         return context
 
@@ -111,20 +85,7 @@ class LibraryTagIndexPage(Page):
         library_pages = LibraryPage.objects.filter(tags__name=tag)
         context['library_pages'] = library_pages
 
-        try:
-            events: Page = apps.get_model(app_label='events', model_name='EventPage')
-            latest_event = events.objects.latest('event_date')
-        except Page.DoesNotExist:
-            latest_event = None
-        context['latest_event'] = latest_event
-
-        try:
-            library_index = apps.get_model(app_label='library', model_name='LibraryIndexPage')
-            library_first_level_children = library_index.objects.first().get_children()
-        except Page.DoesNotExist:
-            library_first_level_children = None
-
-        context['library_areas'] = library_first_level_children
+        append_sidebar_to_context(context)
 
         return context
 
@@ -164,20 +125,7 @@ class LibraryPage(Page):
     def get_context(self, request, *args, **kwargs):
         context = super().get_context(request)
 
-        try:
-            events: Page = apps.get_model(app_label='events', model_name='EventPage')
-            latest_event = events.objects.latest('event_date')
-        except Page.DoesNotExist:
-            latest_event = None
-        context['latest_event'] = latest_event
-
-        try:
-            library_index = apps.get_model(app_label='library', model_name='LibraryIndexPage')
-            library_first_level_children = library_index.objects.first().get_children()
-        except Page.DoesNotExist:
-            library_first_level_children = None
-
-        context['library_areas'] = library_first_level_children
+        append_sidebar_to_context(context)
 
         return context
 
