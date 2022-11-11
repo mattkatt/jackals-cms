@@ -59,9 +59,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
 
                 createOrder: function (data, actions) {
+                    const eventName = document.getElementById('event-title').innerText
+
                     return actions.order.create({
                         purchase_units: [{
-                            "description": `Event Booking for ${bookingForm.email.value}`,
+                            "description": `Event Booking for '${eventName}'`,
                             "amount": {
                                 "currency_code": "GBP",
                                 "value": totalCost / 100
@@ -81,7 +83,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         element.innerHTML = '';
                         element.innerHTML = '<h3>Thank you for your payment!</h3>';
 
-                        // Or go to another URL:  actions.redirect('thank_you.html');
                         bookingForm.submit()
                     });
                 },
