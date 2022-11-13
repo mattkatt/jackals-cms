@@ -37,16 +37,43 @@ def submit_event_booking(request):
     if request.method != "POST":
         return HttpResponseBadRequest('Method not allowed')
 
-    form = EventBookingForm(request.POST)
-    event = EventPage.objects.get(id=request.POST['event_id'])
+    data = request.POST
+    event = EventPage.objects.get(id=data['event_id'])
+
+    booking = EventBooking()
+    booking.event = event
+
+    booking.first_name = data['first_name'].capitalize()
+    booking.last_name = data['last_name'].capitalize()
+    booking.email = data['email']
+    booking.contact_number = data['contact_number']
+    booking.lt_player_id = data['lt_player_id'] if data['lt_player_id'] != '' else None
+    booking.player_type = data['player_type']
+    booking.character_name = data['character_name'].capitalize() if data['character_name'] != '' else None
+    booking.character_faction = data['character_faction'] if data['character_faction'] != '' else None
+    booking.emergency_contact_name = data['emergency_contact_name'].capitalize()
+    booking.emergency_contact_number = data['emergency_contact_number']
+    booking.home_address = data['home_address']
+    booking.medical_information = data['medical_information']
+
+    booking.is_catering = False
+    booking.has_paid = False
+
+    if 'is_catering' in data.values():
+        booking.is_catering = True
+
+    if 'has_paid' in data.values():
+        booking.has_paid = True
 
     try:
-        booking: EventBooking = form.instance
-        booking.event = event
         booking.save()
-        messages.success(request, 'Your booking has been successful! We look forward to seeing you at the event.',
-                         'is-success')
-    except:
+
+        messages.success(
+            request,
+            f'Your booking has been successful! We look forward to seeing you at the event. Booking name: {booking.first_name} {booking.last_name}, Booking type: {booking.get_player_type_display()}',
+            'is-success',
+        )
+    except Exception as e:
         messages.error(request, 'There has been an unresolvable error. If you have paid via paypal, please contact '
                                 'the Jackals Faction for a refund.', 'is-danger')
 
@@ -56,11 +83,14 @@ def submit_event_booking(request):
 class EventBookingAdmin(ModelAdmin):
     model = EventBooking
     base_url_path = 'bookings'
+    menu_label = 'Event Bookings'
     menu_icon = 'list-ul'
+    menu_order = 300
     add_to_settings_menu = False
     exclude_from_explorer = False
-    add_to_admin_menu = False
+    add_to_admin_menu = True
     list_display = (
+        'id',
         'first_name',
         'last_name',
         'email',
@@ -70,8 +100,9 @@ class EventBookingAdmin(ModelAdmin):
         'character_name',
         'character_faction',
         'is_catering',
+        'has_paid',
     )
-    list_filter = ('event_id', )
+    list_filter = ('event', )
     list_export = (
         'first_name',
         'last_name',
@@ -82,8 +113,10 @@ class EventBookingAdmin(ModelAdmin):
         'character_name',
         'character_faction',
         'is_catering',
+        'has_paid',
         'emergency_contact_name',
         'emergency_contact_number',
         'home_address',
         'medical_information',
     )
+    search_fields = ('id', 'email', 'first_name', 'last_name', 'lt_player_id', )

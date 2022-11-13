@@ -18,23 +18,19 @@ const hide = (element) => {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    const bookingForm = document.getElementById('booking_form');
+    const characterDetails = document.getElementById('character_details');
+    const characterNameInput = document.getElementById('id_character_name');
+    const characterFactionInput = document.getElementById('id_character_faction');
+    const playerCost = document.getElementById('player_cost');
+    const monsterCost = document.getElementById('monster_cost');
+    const playerCateringCost = document.getElementById('player_catering_cost');
+    const monsterCateringCost = document.getElementById('monster_catering_cost');
+
+    const characterElementArray = [characterDetails, playerCost, playerCateringCost];
+    const monsterElementArray = [monsterCost, monsterCateringCost];
+
     // To avoid fractional issues, all values are converted to pennies before final tally
-    let totalCost = 0;
-    let isPlayer = true;
-    let isCatering = false;
-    let formIsValid = false;
-
-    const bookingForm = document.getElementById('booking_form')
-    const characterDetails = document.getElementById('character_details')
-    const characterNameInput = document.getElementById('id_character_name')
-    const characterFactionInput = document.getElementById('id_character_faction')
-    const playerCost = document.getElementById('player_cost')
-    const monsterCost = document.getElementById('monster_cost')
-    const playerCateringCost = document.getElementById('player_catering_cost')
-    const monsterCateringCost = document.getElementById('monster_catering_cost')
-
-    const characterElementArray = [characterDetails, playerCost, playerCateringCost]
-    const monsterElementArray = [monsterCost, monsterCateringCost]
 
     const playerCostValue = parseFloat(document.getElementById('player_cost_value').value) * 100;
     const monsterCostValue = parseFloat(document.getElementById('monster_cost_value').value) * 100;
@@ -43,13 +39,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const totalCostDisplay = document.getElementById('total_cost');
 
-    totalCost = playerCostValue;
+    let isPlayer = document.getElementById('id_player_type').value === 'PL';
+    let isCatering = document.getElementById('id_is_catering').checked;
+    let formIsValid = bookingForm.checkValidity();
+    let totalCost = 0;
 
-    characterNameInput.required = true;
-    characterFactionInput.required = true;
+    const totalCostCalc = () => {
+        totalCost = isPlayer ? playerCostValue : monsterCostValue;
+
+        if (isCatering) {
+            totalCost += isPlayer ? playerCateringCostValue : monsterCateringCostValue;
+        }
+    }
+
+    totalCostCalc()
+
+    if (isPlayer) {
+        characterNameInput.required = true;
+        characterFactionInput.required = true;
+    }
 
     const initPayPalButton = () => {
-        if (formIsValid) {
+        if (formIsValid && !bookingForm['has_paid'].checked) {
             paypal.Buttons({
                 style: {
                     shape: 'rect',
@@ -59,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
 
                 createOrder: function (data, actions) {
-                    const eventName = document.getElementById('event-title').innerText
+                    const eventName = document.getElementById('event-name').innerText
 
                     return actions.order.create({
                         purchase_units: [{
@@ -74,14 +85,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 onApprove: function (data, actions) {
                     return actions.order.capture().then(function (orderData) {
+                        bookingForm['has_paid'].checked = true;
 
                         // Full available details
-                        console.log('Capture result', orderData, JSON.stringify(orderData, null, 2));
+                        console.log('Capture result', orderData);
 
                         // Show a success message within this page, e.g.
-                        const element = document.getElementById('paypal-button-container');
-                        element.innerHTML = '';
-                        element.innerHTML = '<h3>Thank you for your payment!</h3>';
+                        document.getElementById('paypal-button-container').innerHTML = '<h3>Thank you for your payment!</h3>';
 
                         bookingForm.submit()
                     });
@@ -105,11 +115,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         })
 
+        document.getElementById('paypal-button-container').innerHTML = ''
+
         fetch('/validate-booking/', {body: new FormData(bookingForm), method: 'POST'})
             .then(response => {
-                const buttonContainer = document.getElementById('paypal-button-container');
-                buttonContainer.innerHTML = '';
-
                 if (!response.ok) {
                     formIsValid = false;
                     response.json().then(json => {
@@ -133,37 +142,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (formIsValid) {
                     if (totalCost > 0) {
-                        initPayPalButton()
+                        initPayPalButton();
                     } else {
-                        buttonContainer.innerHTML = '<input class="button is-link is-large is-fullwidth" type="submit" value="Submit">';
+                        document.getElementById('paypal-button-container').innerHTML =
+                            '<input class="button is-link is-large is-fullwidth" type="submit" value="Submit">';
                     }
                 } else {
-                    buttonContainer.innerHTML = '<div class="block has-background-light p-6"><p>Please ensure you have filled in all required fields in order to finish booking</p></div>'
+                    document.getElementById('paypal-button-container').innerHTML =
+                        '<div class="block has-background-light p-6"><p>Please ensure you have filled in all required fields in order to finish booking</p></div>';
                 }
             })
             .catch(error => {
                 formIsValid = false;
                 console.error('ERROR - The following error occurred:', error)
                 console.error('Please contact Jackals Faction staff with more details')
+            }).finally(() => {
+                if (bookingForm['has_paid'].checked) {
+                    document.getElementById('paypal-button-container').innerHTML =
+                            '<input class="button is-link is-large is-fullwidth" type="submit" value="Submit">';
+                }
             })
     }
 
-    const calculateCosts = () => {
-        totalCost = isPlayer ? playerCostValue : monsterCostValue;
-
-        if (isCatering) {
-            totalCost += isPlayer ? playerCateringCostValue : monsterCateringCostValue;
-        }
-
-        totalCostDisplay.innerText = (totalCost / 100).toFixed(2)
-
-        validateForm()
-    }
-
-    const initForm = () => {
-        const selector = document.getElementById('id_player_type')
-
-        switch (selector.value) {
+    const playerTypeSwitch = (type) => {
+        switch (type) {
             case PLAYER:
                 isPlayer = true;
                 show(characterElementArray);
@@ -175,40 +177,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 isPlayer = false;
                 hide(characterElementArray)
                 show(monsterElementArray)
+                characterNameInput.value = '';
                 characterNameInput.required = false;
+                characterFactionInput.value = '';
                 characterFactionInput.required = false;
                 break;
         }
+    }
 
-        calculateCosts()
+    const calculateCosts = () => {
+        totalCostCalc()
+        totalCostDisplay.innerText = (totalCost / 100).toFixed(2);
+        validateForm();
     }
 
     bookingForm.addEventListener('change', (evt) => {
         if (evt.target.id === 'id_player_type') {
-            switch (evt.target.value) {
-                case PLAYER:
-                    isPlayer = true;
-                    show(characterElementArray);
-                    hide(monsterElementArray);
-                    characterNameInput.required = true;
-                    characterFactionInput.required = true;
-                    break;
-                case MONSTER:
-                    isPlayer = false;
-                    hide(characterElementArray)
-                    show(monsterElementArray)
-                    characterNameInput.required = false;
-                    characterFactionInput.required = false;
-                    break;
-            }
+            playerTypeSwitch(evt.target.value)
         }
 
         if (evt.target.id === 'id_is_catering') {
             isCatering = !!evt.target.checked;
         }
 
-        calculateCosts()
+        calculateCosts();
     })
 
-    initForm()
+    setTimeout(() => {
+        playerTypeSwitch(document.getElementById('id_player_type').value);
+        calculateCosts();
+    }, 300)
 })

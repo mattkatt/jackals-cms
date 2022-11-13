@@ -28,6 +28,12 @@
       {% endfor %}
     {% endif %}
 
+    {% if booking_form.non_field_errors %}
+      <article class="message is-danger">
+        <div class="message-body">{{ booking_form.non_field_errors }}</div>
+      </article>
+    {% endif %}
+
     <p class="intro is-italic is-size-5">{{ page.intro }}</p>
 
     {{ page.description|richtext }}
@@ -67,12 +73,6 @@
 
       <form class="form" id="booking_form" action="/submit-event-booking/" method="post">
         {% csrf_token %}
-
-        {% if booking_form.non_field_errors %}
-          <article class="message is-danger">
-            <div class="message-body">{{ booking_form.non_field_errors }}</div>
-          </article>
-        {% endif %}
 
         <input type="hidden" name="event_id" value="{{ page.id }}" />
 
@@ -268,6 +268,7 @@
 
         <h3 class="is-3">
           Total Cost: £<span id="total_cost"></span>
+          <div class="is-hidden">{{ booking_form.has_paid }}</div>
         </h3>
 
         <div class="field">

@@ -89,9 +89,10 @@ class EventBooking(Orderable):
     player_type = models.CharField(max_length=2, choices=PLAYER_TYPES, default=PLAYER)
 
     character_name = models.CharField(max_length=255, blank=True, null=True)
-    character_faction = models.CharField(max_length=1, choices=FACTIONS, blank=True, null=True)
+    character_faction = models.CharField(max_length=1, choices=FACTIONS, verbose_name='Faction', blank=True, null=True)
 
     is_catering = models.BooleanField(verbose_name='YES, I want food!', default=False)
+    has_paid = models.BooleanField(default=False)
     emergency_contact_name = models.CharField(
         max_length=255, validators=[RegexValidator('^[\\D]*$', message='Must contain only non-digit characters')]
     )
@@ -102,6 +103,7 @@ class EventBooking(Orderable):
     medical_information = models.TextField(blank=True)
 
     panels = [
+        FieldPanel('event'),
         FieldPanel('first_name'),
         FieldPanel('last_name'),
         FieldPanel('email'),
@@ -111,6 +113,7 @@ class EventBooking(Orderable):
         FieldPanel('character_name'),
         FieldPanel('character_faction'),
         FieldPanel('is_catering'),
+        FieldPanel('has_paid'),
         FieldPanel('emergency_contact_name'),
         FieldPanel('emergency_contact_number'),
         FieldPanel('home_address'),
@@ -147,10 +150,11 @@ class EventBookingForm(ModelForm):
             'emergency_contact_number',
             'home_address',
             'medical_information',
+            'has_paid',
         ]
         widgets = {
             'home_address': Textarea(attrs={'rows': 3}),
-            'medical_information': Textarea(attrs={'rows': 3})
+            'medical_information': Textarea(attrs={'rows': 3}),
         }
 
 
