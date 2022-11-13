@@ -11,14 +11,14 @@
 
   <div class="block">
     <div class="columns is-multiline">
-      {% for library_page in library_pages %}
+      {% for library_page in library_pages.live %}
         {% with page=library_page.specific %}
           <div class="column is-half">
             <h2 class="title is-h2"><a href="{% pageurl page %}">{{ page.title }}</a></h2>
             <p class="subtitle is-italic is-size-5">{{ page.intro }}</p>
-            {% if library_page.get_children %}
+            {% if library_page.get_children.live %}
               <ul>
-                {% for child_page in library_page.get_children %}
+                {% for child_page in library_page.get_children.live %}
                   <li>
                     <a href="{% pageurl child_page %}">{{ child_page.title }}</a>
                   </li>
