@@ -8,7 +8,7 @@ if os.path.isfile(dotenv_file):
     dotenv.load_dotenv(dotenv_file)
 
 if __name__ == "__main__":
-    if os.environ['IS_DEV']:
+    if 'IS_DEV' in os.environ:
         os.environ.setdefault("DJANGO_SETTINGS_MODULE", "main.settings.dev")
     else:
         os.environ.setdefault("DJANGO_SETTINGS_MODULE", "main.settings.production")
