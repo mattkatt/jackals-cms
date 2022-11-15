@@ -30,6 +30,12 @@ nav.navbar .navbar-brand img {
   background-position: center;
 }
 
+@media screen and (max-width: 500px) {
+  .section.main-section {
+    padding: 3rem 0;
+  }
+}
+
 .box.paint {
   border-radius: 0;
   padding: 1rem!important;
