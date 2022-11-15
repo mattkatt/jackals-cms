@@ -10,7 +10,7 @@ main.main {
 }
 
 .font.fancy {
-  font-family: 'Montez'
+  font-family: 'Montez';
 }
 
 nav.navbar, footer.footer {
@@ -28,4 +28,33 @@ nav.navbar .navbar-brand img {
 
 .hero.hero-img.hero-img-center {
   background-position: center;
+}
+
+.box.paint {
+  border-radius: 0;
+  padding: 1rem!important;
+  position: relative;
+  margin-bottom: 3rem!important;
+}
+
+.box.paint:before,
+.box.paint:after {
+  content: '';
+  width: 100%;
+  display: block;
+  position: absolute;
+}
+
+.box.paint:before {
+  background-image: url("/static/img/white-paint-edge-top.png");
+  height: 18px;
+  top: -18px;
+  left: 0;
+}
+
+.box.paint:after {
+  background-image: url("/static/img/white-paint-edge-bottom.png");
+  height: 32px;
+  bottom: -32px;
+  left: 0;
 }
