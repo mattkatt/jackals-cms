@@ -71,6 +71,14 @@
         </div>
       {% endif %}
 
+      <noscript>
+        <div class="message is-danger">
+          <div class="message-body">
+            <p>Sorry - this booking form requires JavaScript to be enabled in order to function. Please contact the Jackals faction staff in order to book this event.</p>
+          </div>
+        </div>
+      </noscript>
+
       <form class="form" id="booking_form" action="/submit-event-booking/" method="post">
         {% csrf_token %}
 
