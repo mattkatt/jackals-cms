@@ -37,7 +37,7 @@ class LibraryCategoryIndexPage(Page):
 
         # filter by cat
         category = request.GET.get('category')
-        library_pages = LibraryPage.objects.filter(categories__name=category)
+        library_pages = LibraryPage.objects.filter(categories__name=category, live=True)
         context['library_pages'] = library_pages
 
         append_sidebar_to_context(context)
@@ -82,7 +82,7 @@ class LibraryTagIndexPage(Page):
 
         # Filter by tag
         tag = request.GET.get('tag')
-        library_pages = LibraryPage.objects.filter(tags__name=tag)
+        library_pages = LibraryPage.objects.filter(tags__name=tag, live=True)
         context['library_pages'] = library_pages
 
         append_sidebar_to_context(context)

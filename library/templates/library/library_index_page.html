@@ -17,10 +17,10 @@
             <h2 class="title is-h2"><a href="{% pageurl page %}">{{ page.title }}</a></h2>
             <p class="subtitle is-italic is-size-5">{{ page.intro }}</p>
             {% if library_page.get_children.live %}
-              <ul>
+              <ul class="ul">
                 {% for child_page in library_page.get_children.live %}
                   <li>
-                    <a href="{% pageurl child_page %}">{{ child_page.title }}</a>
+                    <a class="link paint-link" href="{% pageurl child_page %}">{{ child_page.title }}</a>
                   </li>
                 {% endfor %}
               </ul>

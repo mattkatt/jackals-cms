@@ -21,6 +21,28 @@ nav.navbar .navbar-brand img {
   margin-right: 6px;
 }
 
+@media screen and (min-width: 1024px) {
+  nav.navbar .navbar-end a.lt-link {
+    color: #161E29 !important;
+    background-color: white !important;
+  }
+
+  nav.navbar .navbar-end a.lt-link:hover {
+    text-decoration: underline;
+  }
+}
+
+nav.navbar .navbar-end a.lt-link:before {
+  content: '';
+  width: 25px;
+  display: block;
+  position: absolute;
+  background-image: url("/static/img/white-paint-edge-left.png");
+  height: 100%;
+  top: 0;
+  left: -25px;
+}
+
 .hero.hero-img {
   background-position: center 20%;
   background-size: cover;
@@ -63,4 +85,27 @@ nav.navbar .navbar-brand img {
   height: 32px;
   bottom: -32px;
   left: 0;
+}
+
+a.link.paint-link {
+  background-image: url(/static/img/navy-link-bg.png);
+  background-position: center center;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  display: inline-block;
+  padding: 8px 30px;
+  color: white;
+}
+
+a.link.paint-link:hover {
+  text-decoration: underline;
+}
+
+.push-link-right a.link.paint-link {
+  margin-right: -30px;
+}
+
+ul.ul {
+  list-style: none;
+  margin-left: 0
 }
