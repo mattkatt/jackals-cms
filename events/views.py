@@ -59,10 +59,10 @@ def submit_event_booking(request):
     booking.is_catering = False
     booking.has_paid = False
 
-    if 'is_catering' in data.values():
+    if 'is_catering' in data and data['is_catering'] == 'on':
         booking.is_catering = True
 
-    if 'has_paid' in data.values():
+    if 'has_paid' in data and data['has_paid'] == 'on':
         booking.has_paid = True
 
     try:
@@ -100,6 +100,7 @@ class EventBookingAdmin(ModelAdmin):
         'character_name',
         'character_faction',
         'is_catering',
+        'has_paid',
     )
     list_filter = ('event', )
     list_export = (

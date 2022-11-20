@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         bookingForm['has_paid'].checked = true;
 
                         // Full available details
-                        console.log('Capture result', orderData);
+                        // console.log('Capture result', orderData);
 
                         // Show a success message within this page, e.g.
                         document.getElementById('paypal-button-container').innerHTML = '<h3>Thank you for your payment!</h3>';
