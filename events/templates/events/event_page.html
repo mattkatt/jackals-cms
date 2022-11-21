@@ -222,6 +222,7 @@
           {% if booking_form.is_catering.errors %}
             <p class="help is-danger">{{ booking_form.is_catering.errors }}</p>
           {% endif %}
+          <p class="is-size-7">If you have any food requirements, please contact {{ page.catering_name }} ({{ page.catering_contact_email }}) to let them know.</p>
         </div>
 
         <div class="field">

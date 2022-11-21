@@ -180,6 +180,8 @@ class EventPage(Page):
         verbose_name='Monster catering cost', default=0, max_digits=4, decimal_places=2,
         validators=[MinValueValidator(0)]
     )
+    catering_name = models.CharField(max_length=250)
+    catering_contact_email = models.EmailField()
 
     subpage_types = []
 
@@ -195,6 +197,8 @@ class EventPage(Page):
         FieldPanel('monster_cost'),
         FieldPanel('player_catering_cost'),
         FieldPanel('monster_catering_cost'),
+        FieldPanel('catering_name'),
+        FieldPanel('catering_contact_email'),
     ]
 
     @property
