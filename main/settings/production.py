@@ -14,7 +14,7 @@ PAYPAL_CLIENT_ID = os.environ['PAYPAL_CLIENT_ID']
 
 ALLOWED_HOSTS = [
     'jackalsfaction.pythonanywhere.com',
-    'jackalfaction.com'
+    'www.jackalfaction.uk'
 ]
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
