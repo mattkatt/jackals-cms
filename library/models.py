@@ -97,6 +97,7 @@ class LibraryPage(Page):
     tags = ClusterTaggableManager(through=LibraryPageTag, blank=True)
     categories = ParentalManyToManyField('library.LibraryCategory', blank=True)
 
+    parent_page_types = ['library.LibraryPage', 'library.LibraryIndexPage']
     subpage_types = ['library.LibraryPage']
 
     def main_image(self):
