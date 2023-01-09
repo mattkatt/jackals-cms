@@ -22,3 +22,13 @@ class FooterTextSnippet(models.Model):
 
     def __str__(self):
         return self.text
+
+
+class AdminData(models.Model):
+    class Meta:
+        verbose_name = 'Admin Resource'
+
+    resource_name = models.CharField(max_length=255)
+    resource_url = models.CharField(max_length=255)
+    username = models.CharField(max_length=255)
+    password = models.CharField(max_length=255)
