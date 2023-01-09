@@ -1,3 +1,4 @@
+import re
 from django.db import models
 
 from wagtail.admin.panels import FieldPanel
@@ -21,7 +22,7 @@ class FooterTextSnippet(models.Model):
     ]
 
     def __str__(self):
-        return self.text
+        return re.sub('<[^<]+?>', '', self.text)
 
 
 class AdminData(models.Model):
