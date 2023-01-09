@@ -1,0 +1,7 @@
+{% load wagtailcore_tags %}
+
+{% if footer_text %}
+  {% for item in footer_text %}
+    <p>{{ item.text|richtext }}</p>
+  {% endfor %}
+{% endif %}

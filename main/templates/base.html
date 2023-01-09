@@ -1,4 +1,4 @@
-{% load static wagtailcore_tags wagtailimages_tags wagtailuserbar %}
+{% load static wagtailcore_tags wagtailimages_tags wagtailuserbar nav_tags %}
 
 <!DOCTYPE html>
 <html class="no-js" lang="en">
@@ -114,12 +114,7 @@
 
 <footer class="footer paint has-text-white">
   <div class="content has-text-centered">
-    <p class="text-light">
-      Website &copy; {% now "Y" %} Jackals Faction. Lorien Trust creative content &copy; Lorien Trust
-    </p>
-    <p>
-      Join us on <a href="https://www.facebook.com/groups/2374422445" target="_blank">Facebook</a>
-    </p>
+    {% get_footer_text %}
   </div>
 </footer>
 
