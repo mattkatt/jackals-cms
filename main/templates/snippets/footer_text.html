@@ -2,6 +2,6 @@
 
 {% if footer_text %}
   {% for item in footer_text %}
-    <p>{{ item.text|richtext }}</p>
+    {{ item.text|richtext }}
   {% endfor %}
 {% endif %}
