@@ -102,7 +102,7 @@ class EventBookingAdmin(ModelAdmin):
         'is_catering',
         'has_paid',
     )
-    list_filter = ('event', )
+    list_filter = ('player_type', 'event', )
     list_export = (
         'first_name',
         'last_name',
