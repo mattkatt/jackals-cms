@@ -189,6 +189,7 @@ SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
 # Email details
 EMAIL_HOST = os.getenv("EMAIL_HOST")
 EMAIL_PORT = os.getenv("EMAIL_PORT")
-EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL")
+EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", False)
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", False)
 EMAIL_HOST_USER =  os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
