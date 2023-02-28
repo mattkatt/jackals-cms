@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.contrib import messages
-from django.core.mail import send_mass_mail
+from django.core.mail import send_mass_mail, EmailMessage
 from django.http import HttpResponseBadRequest, HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from wagtail.contrib.modeladmin.options import ModelAdmin
@@ -151,9 +151,10 @@ def event_email_view(request):
             recipient_list = list(recipients.values_list('email', flat=True))
 
             email_subject = f"Jackal Event - {event.title}"
-            email = (email_subject, email_content, settings.EMAIL_HOST_USER, recipient_list)
 
-            send_mass_mail((email,), fail_silently=False)
+            for recipient in recipient_list:
+                email = EmailMessage(subject=email_subject, body=email_content, from_email=settings.EMAIL_HOST_USER, to=(recipient,))
+                email.send()
 
             messages.success(request, 'Email sent')
         except Exception as e:
