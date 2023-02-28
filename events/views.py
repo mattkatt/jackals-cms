@@ -1,8 +1,12 @@
+from django.conf import settings
 from django.contrib import messages
+from django.core.mail import send_mass_mail
 from django.http import HttpResponseBadRequest, HttpResponseRedirect, HttpResponse
+from django.shortcuts import render
 from wagtail.contrib.modeladmin.options import ModelAdmin
 
 from events.models import EventBookingForm, EventPage, EventBooking
+from events.forms import EventEmailForm
 
 
 # Create your views here.
@@ -120,3 +124,45 @@ class EventBookingAdmin(ModelAdmin):
         'medical_information',
     )
     search_fields = ('id', 'email', 'first_name', 'last_name', 'lt_player_id', )
+
+
+def event_email_view(request):
+    if request.method == 'POST':
+        try:
+            event = EventPage.objects.get(id=request.POST['event'])
+            recipient_types = request.POST['player_types']
+            email_content = request.POST['email_content']
+
+            if recipient_types is '':
+                raise Exception('No recipient type')
+
+            if email_content is '':
+                raise Exception('No email content')
+
+            if recipient_types == EventBooking.PLAYER:
+                recipients = event.player_bookings
+            elif recipient_types == EventBooking.MONSTER:
+                recipients = event.monster_bookings
+            elif recipient_types == EventBooking.STAFF:
+                recipients = event.staff_bookings
+            else:
+                recipients = event.all_bookings
+
+            recipient_list = list(recipients.values_list('email', flat=True))
+
+            email_subject = f"Jackal Event - {event.title}"
+            email = (email_subject, email_content, settings.EMAIL_HOST_USER, recipient_list)
+
+            send_mass_mail((email,), fail_silently=False)
+
+            messages.success(request, 'Email sent')
+        except Exception as e:
+            messages.error(request, f'There was an error sending the email - {e}')
+
+
+    return render(request, 'wagtailadmin/generic/form.html', context={
+        'page_title': 'Event Email',
+        'header_icon': 'mail',
+        'form': EventEmailForm,
+        'submit_button_label': 'Submit',
+    })

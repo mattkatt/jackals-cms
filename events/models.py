@@ -214,6 +214,10 @@ class EventPage(Page):
         return EventBooking.objects.filter(event=self, player_type=EventBooking.MONSTER)
 
     @property
+    def staff_bookings(self):
+        return EventBooking.objects.filter(event=self, player_type=EventBooking.STAFF)
+
+    @property
     def has_max_players(self):
         return len(self.player_bookings) >= self.player_limit
 
@@ -239,3 +243,9 @@ class EventPage(Page):
         append_sidebar_to_context(context)
 
         return context
+
+
+class EventEmail(models.Model):
+    event = models.ForeignKey('EventPage', on_delete=models.PROTECT)
+    player_types = models.CharField(max_length=8, choices=EventBooking.PLAYER_TYPES + [('A', 'All')])
+    email_content = models.TextField()
