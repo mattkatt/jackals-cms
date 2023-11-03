@@ -3,7 +3,7 @@ asgiref==3.5.0
 beautifulsoup4==4.9.3
 certifi==2023.7.22
 charset-normalizer==2.0.12
-Django==4.1.10
+Django==4.1.13
 django-filter==21.1
 django-modelcluster==6.0
 django-permissionedforms==0.1
