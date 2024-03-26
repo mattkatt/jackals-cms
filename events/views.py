@@ -1,6 +1,8 @@
+import logging
+
 from django.conf import settings
 from django.contrib import messages
-from django.core.mail import send_mass_mail, EmailMessage
+from django.core.mail import send_mass_mail
 from django.http import HttpResponseBadRequest, HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from wagtail.contrib.modeladmin.options import ModelAdmin
@@ -8,6 +10,8 @@ from wagtail.contrib.modeladmin.options import ModelAdmin
 from events.models import EventBookingForm, EventPage, EventBooking
 from events.forms import EventEmailForm
 
+
+logger = logging.getLogger(__name__)
 
 # Create your views here.
 def validate_event_form(request):
@@ -79,7 +83,8 @@ def submit_event_booking(request):
         )
     except Exception as e:
         messages.error(request, 'There has been an unresolvable error. If you have paid via paypal, please contact '
-                                'the Jackals Faction for a refund.', 'is-danger')
+                                'the Jackals Faction staff with your details.', 'is-danger')
+        logger.error(f'Error saving booking: {e}', exc_info=e)
 
     return HttpResponseRedirect(event.url)
 
@@ -133,10 +138,10 @@ def event_email_view(request):
             recipient_types = request.POST['player_types']
             email_content = request.POST['email_content']
 
-            if recipient_types is '':
+            if recipient_types == '':
                 raise Exception('No recipient type')
 
-            if email_content is '':
+            if email_content == '':
                 raise Exception('No email content')
 
             if recipient_types == EventBooking.PLAYER:
@@ -152,13 +157,16 @@ def event_email_view(request):
 
             email_subject = f"Jackal Event - {event.title}"
 
-            for recipient in recipient_list:
-                email = EmailMessage(subject=email_subject, body=email_content, from_email=settings.EMAIL_HOST_USER, to=(recipient,))
-                email.send()
+            email_tuple = (email_subject, email_content, settings.EMAIL_HOST_USER, recipient_list)
+
+            send_mass_mail((email_tuple,), fail_silently=False)
 
             messages.success(request, 'Email sent')
+        except EventPage.DoesNotExist:
+            messages.error(request, 'Event does not exist')
         except Exception as e:
             messages.error(request, f'There was an error sending the email - {e}')
+            logger.error(f'Error sending email: {e}', exc_info=e)
 
 
     return render(request, 'wagtailadmin/generic/form.html', context={
